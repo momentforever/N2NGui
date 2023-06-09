@@ -1,6 +1,5 @@
 import logging
 import subprocess
-import os
 import threading
 
 from src.common.custom_config import get_config, CustomConfig
@@ -14,6 +13,7 @@ class N2NEdge:
     _config: CustomConfig = None
     _thread = None
     _process = None
+    _log_fd = None
 
     def __init__(self):
         if self.status not in Status.ENABLE_START:
@@ -21,15 +21,17 @@ class N2NEdge:
 
         self.status = Status.OFF
         self._config = get_config()
+        if not self._log_fd:
+            self._log_fd = open(self._config.LOG_PATH, "a", encoding='utf8')
         self._thread = None
         self._process = None
 
 
     def _generate_cmd(self):
         cmd = []
-        if not self._config._EDGE_PATH:
+        if not self._config.EDGE_PATH:
             raise CustomException("缺少脚本路径")
-        cmd.append(self._config._EDGE_PATH)
+        cmd.append(self._config.EDGE_PATH)
 
         if not self._config.SUPERNODE:
             raise CustomException("缺少服务器节点")
@@ -53,6 +55,9 @@ class N2NEdge:
             cmd.append("-M")
             cmd.append(self._config.EDGE_PACKAGE_SIZE)
 
+        # cmd.append("-I")
+        # cmd.append("tmfhouse")
+        # print(cmd)
         logging.debug(cmd)
         return cmd
 
@@ -65,33 +70,30 @@ class N2NEdge:
         edge_cmd = self._generate_cmd()
 
         self.status = Status.STARTING
+        self._process = subprocess.Popen(edge_cmd, stdout=self._log_fd, stderr=self._log_fd)
         # 启动 n2n Edge 程序，并捕获标准输出
-        self._process = subprocess.Popen(edge_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        # self._process = subprocess.Popen(edge_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
         self.status = Status.ON
-        logging.info("start n2n edge.")
+        print("start n2n edge!")
         # TODO 日志监听
         # 监听日志输出
         while self.status == Status.ON:
+            # print("now status={0}".format(self.status))
             # 监控进程异常是否挂掉
             if self._process.poll() is not None:
                 self.status = Status.STOPPING
                 break
-
-            try:
-                output = self._process.stdout.readline().decode("utf-8")  # 解码为字符串
-                if output:
-                    print(output.strip())  # 输出日志信息，可以根据需要进行处理
-            except:
-                print("null")
 
         self._stop()
         return
 
     def _stop(self):
         try:
+            print("closing n2n edge...")
             self._process.terminate()  # 终止进程
             self.status = Status.OFF
-            logging.info("close n2n edge.")
+            print("close n2n edge!")
         except Exception as e:
             logging.error(e)
             raise CustomException("停止进程失败")

@@ -54,6 +54,7 @@ class GUI:
 
         # 创建一个变量来保存开关的状态
         self.is_boot_up_switch_var = tk.BooleanVar()
+        self.is_boot_up_switch_var.set(config.IS_BOOT_UP)
         is_boot_up_switch = tk.Checkbutton(window, text="开机自启动：",
                                            variable=self.is_boot_up_switch_var,
                                            command=self.is_boot_up_event)
@@ -71,7 +72,6 @@ class GUI:
     def start_edge_event(self):
         n2n_edge = get_n2n_edge()
         config = get_config()
-        print("status = {0}".format(n2n_edge.status))
         if n2n_edge.status != Status.ON:
             config.SUPERNODE = self.supernode_entry.get()
             config.EDGE_IP = self.edge_ip_entry.get()
@@ -84,6 +84,12 @@ class GUI:
             n2n_edge.stop_thread()
 
     def save_config_event(self):
+        config = get_config()
+        config.SUPERNODE = self.supernode_entry.get()
+        config.EDGE_IP = self.edge_ip_entry.get()
+        config.EDGE_COMMUNITY = self.edge_community_entry.get()
+        config.EDGE_COMMUNITY_PASSWORD = self.edge_community_entry.get()
+        config.write_to_config()
         pass
 
     def is_boot_up_event(self):

@@ -55,7 +55,7 @@ def add_to_boot_up():
                              startup_key,
                              0,
                              winreg.KEY_ALL_ACCESS)
-        winreg.SetValueEx(key, REG_NAME, 0, winreg.REG_SZ, config._EXE_PATH)  # 将应用程序的路径添加到注册表中
+        winreg.SetValueEx(key, REG_NAME, 0, winreg.REG_SZ, config.EXE_PATH)  # 将应用程序的路径添加到注册表中
         winreg.CloseKey(key)
     except CustomException as e:
         raise e
@@ -72,6 +72,7 @@ def delete_from_boot_up():
         # 删除与您的软件相关的注册表项
         winreg.DeleteValue(key, REG_NAME)
 
-    except FileNotFoundError:
-        print("未找到启动项")
+    except FileNotFoundError as e:
+        logging.error(e)
+        return
 
