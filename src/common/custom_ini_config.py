@@ -3,13 +3,13 @@ import os.path
 
 
 class CustomINIConfig:
-    DEBUG_LEVEL = "ERROR"
+    LOG_LEVEL = "INFO"
     IS_BOOT_UP = False
 
-    SUPERNODE = None
-    EDGE_IP = None
-    EDGE_COMMUNITY = None
-    EDGE_COMMUNITY_PASSWORD = None
+    SUPERNODE = ""
+    EDGE_IP = ""
+    EDGE_COMMUNITY = ""
+    EDGE_COMMUNITY_PASSWORD = ""
     EDGE_PACKAGE_SIZE = "1386"
 
     def __init__(self, path):
