@@ -8,7 +8,6 @@ class CustomLogging:
     path = None
     level = None
     write_fd = None
-    read_fd = None
 
     def __init__(self):
         config = get_config()
@@ -18,18 +17,15 @@ class CustomLogging:
         # 重新生成Log
         if self.write_fd:
             self.write_fd.close()
-        if self.read_fd:
-            self.read_fd.close()
 
         if os.path.exists(self.path):
             os.remove(self.path)
 
         self.write_fd = open(self.path, mode='a', encoding='utf8')
-        self.read_fd = open(self.path, mode='r', encoding='utf8')
+
         logging.basicConfig(level=logging.getLevelName(config.LOG_LEVEL),
                             stream=self.write_fd,
-                            format='[%(asctime)s][%(levelname)s]%(message)s',
-                            encoding='utf8')
+                            format='[%(asctime)s][%(levelname)s]%(message)s')
 
 
 global_logging = None

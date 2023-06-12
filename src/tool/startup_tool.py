@@ -1,6 +1,5 @@
 import logging
 import winreg
-import os
 import ctypes
 
 from src.common.custom_config import get_config

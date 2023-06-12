@@ -1,4 +1,3 @@
-import configparser
 import os
 
 from src.common.custom_exception import CustomException
@@ -6,12 +5,13 @@ from src.common.custom_ini_config import CustomINIConfig
 
 
 class CustomConfig(CustomINIConfig):
-
     WORKER_DIR = None
     EXE_SUB_PATH = "n2nGui.exe"
     EXE_PATH = None
     EDGE_SUB_PATH = "n2n\\edge.exe"
     EDGE_PATH = None
+    NIC_SUB_PATH = "tools\\tap-windows\\9.21.2.exe"
+    NIC_PATH = None
     CONFIG_SUB_PATH = "config.ini"
     CONFIG_PATH = None
     LOG_SUB_PATH = "gui.log"
@@ -23,7 +23,7 @@ class CustomConfig(CustomINIConfig):
         self.EDGE_PATH = os.path.join(self.WORKER_DIR, self.EDGE_SUB_PATH)
         self.CONFIG_PATH = os.path.join(self.WORKER_DIR, self.CONFIG_SUB_PATH)
         self.LOG_PATH = os.path.join(self.WORKER_DIR, self.LOG_SUB_PATH)
-
+        self.NIC_PATH = os.path.join(self.WORKER_DIR, self.NIC_SUB_PATH)
         super().__init__(self.CONFIG_PATH)
 
     def read_from_config(self):

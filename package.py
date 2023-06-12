@@ -12,6 +12,7 @@ package_dir = ".\\package"
 options = [
     '-n',
     project_name,
+    '--uac-admin',  # 以管理员运行
     '--onefile',  # 生成单个可执行文件
     '--noconsole',  # 不显示控制台窗口
     '--clean',  # 清理临时文件
@@ -20,15 +21,13 @@ options = [
 # 使用 PyInstaller 编译脚本为可执行文件
 PyInstaller.__main__.run([source_file] + options)
 
-
 if os.path.exists(package_dir):
     shutil.rmtree(package_dir)
 os.mkdir(package_dir, mode=777)
 
 shutil.copytree("n2n", os.path.join(package_dir, "n2n"))
+shutil.copytree("tools", os.path.join(package_dir, "tools"))
 shutil.copy(os.path.join(".\\dist", f"{project_name}.exe"), package_dir)
-
-
 
 # 删除不需要的中间内容
 delete_files = [

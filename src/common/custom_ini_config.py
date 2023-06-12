@@ -3,21 +3,22 @@ import os.path
 
 
 class CustomINIConfig:
+    IS_QS = False
+
     LOG_LEVEL = "INFO"
-    IS_BOOT_UP = False
+    IS_STARTUP = False
 
     SUPERNODE = ""
     EDGE_IP = ""
     EDGE_COMMUNITY = ""
     EDGE_COMMUNITY_PASSWORD = ""
-    EDGE_PACKAGE_SIZE = "1386"
+    EDGE_PACKAGE_SIZE = 1386
 
     def __init__(self, path):
         if not os.path.exists(path):
             self._write_to_config(path)
         self._read_from_config(path)
 
-    @classmethod
     def _read_from_config(self, path):
         config = configparser.ConfigParser()
         config.read(path)
