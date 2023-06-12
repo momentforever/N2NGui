@@ -21,7 +21,7 @@ class CustomLogging:
         if os.path.exists(self.path):
             os.remove(self.path)
 
-        self.write_fd = open(self.path, mode='a', encoding='utf8')
+        self.write_fd = open(self.path, mode='a', encoding='utf-8')
 
         logging.basicConfig(level=logging.getLevelName(config.LOG_LEVEL),
                             stream=self.write_fd,
