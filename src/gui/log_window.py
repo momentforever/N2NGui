@@ -32,8 +32,8 @@ class LogWindow(QWidget):
     def log_worker(self):
         while self.is_running:
             try:
-                with open(self.log_file, "r", encoding='utf-8') as file:
-                    file.seek(0, 2)  # Move the file pointer to the end
+                with open(self.log_file, "r", encoding='gbk') as file:
+                    # file.seek(0, 2)  # Move the file pointer to the end
                     while self.is_running:
                         line = file.readline().strip()
                         if line:

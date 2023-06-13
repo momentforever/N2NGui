@@ -1,6 +1,7 @@
 import logging
 import subprocess
 import threading
+import time
 
 from src.common.custom_config import get_config, CustomConfig
 from src.common.custom_const import Status
@@ -82,6 +83,7 @@ class N2NEdge:
             if self._process.poll() is not None:
                 self.status = Status.STOPPING
                 break
+            time.sleep(0.1)  # Wait for some time before reading the file
 
         self._stop()
         return
@@ -114,20 +116,20 @@ class N2NEdge:
         self.status = Status.STOPPING
 
 
-n2n_edge = None
+global_n2n_edge = None
 
 
 def get_n2n_edge() -> N2NEdge:
-    global n2n_edge
-    if not n2n_edge:
+    global global_n2n_edge
+    if not global_n2n_edge:
         raise CustomException("未初始化N2N EDGE")
-    return n2n_edge
+    return global_n2n_edge
 
 
 def init_n2n_edge() -> N2NEdge:
-    global n2n_edge
-    if not n2n_edge:
-        n2n_edge = N2NEdge()
+    global global_n2n_edge
+    if not global_n2n_edge:
+        global_n2n_edge = N2NEdge()
     else:
-        n2n_edge.__init__()
-    return n2n_edge
+        global_n2n_edge.__init__()
+    return global_n2n_edge
