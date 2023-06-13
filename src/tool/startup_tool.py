@@ -20,7 +20,10 @@ def is_admin():
 def is_exist_in_startup():
     try:
         # 打开注册表项
-        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, START_KEY, 0, winreg.KEY_READ)
+        key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                             START_KEY,
+                             0,
+                             winreg.KEY_READ)
 
         # 获取注册表项中的所有值名称
         value_names = []
@@ -44,19 +47,20 @@ def is_exist_in_startup():
 
 def add_to_startup():
     if not is_admin():
-        raise CustomException("必须以管理员方式启动")
+        raise CustomException("请以管理员身份运行")
 
     if is_exist_in_startup():
         return
 
     try:
         config = get_config()
-        # 打开 "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" 注册表项
-        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
+        key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
                              START_KEY,
                              0,
                              winreg.KEY_ALL_ACCESS)
-        winreg.SetValueEx(key, REG_NAME, 0, winreg.REG_SZ, config.EXE_PATH)  # 将应用程序的路径添加到注册表中
+        logging.info(f"Add {config.EXE_PATH} to start up!")
+        cmd_str = f'"{config.EXE_PATH}"'
+        winreg.SetValueEx(key, REG_NAME, 0, winreg.REG_SZ, cmd_str)  # 将应用程序的路径添加到注册表中
         winreg.CloseKey(key)
     except Exception as e:
         logging.error(e)
@@ -66,7 +70,10 @@ def add_to_startup():
 def delete_from_startup():
     try:
         # 打开注册表项
-        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, START_KEY, 0, winreg.KEY_ALL_ACCESS)
+        key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                             START_KEY,
+                             0,
+                             winreg.KEY_ALL_ACCESS)
 
         # 删除与您的软件相关的注册表项
         winreg.DeleteValue(key, REG_NAME)

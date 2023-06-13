@@ -16,6 +16,6 @@ def install_nic():
             if process.poll() is not None:
                 break
     except (PermissionError, WindowsError) as e:
-        raise CustomException("权限不足，需管理员权限！")
+        raise CustomException("请以管理员身份运行")
     except Exception as e:
         logging.error(e)

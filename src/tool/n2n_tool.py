@@ -60,8 +60,7 @@ class N2NEdge:
         logging.debug("Start n2n edge command is {0}".format(" ".join(cmd)))
         return cmd
 
-
-    def _run(self):
+    def _run_process(self):
         if self.status not in Status.ENABLE_START:
             return
 
@@ -73,47 +72,49 @@ class N2NEdge:
                                          stdout=self._log_fd,
                                          stderr=self._log_fd,
                                          creationflags=subprocess.CREATE_NO_WINDOW)
-
         self.status = Status.ON
         logging.info("Start n2n edge!")
-        # TODO 日志监听
-        # 监听日志输出
-        while self.status == Status.ON:
+
+        while True:
             # 监控进程异常是否挂掉
             if self._process.poll() is not None:
                 self.status = Status.STOPPING
                 break
-            time.sleep(0.1)  # Wait for some time before reading the file
-
+            time.sleep(0.1)  # 等待
         self._stop()
-        return
 
-    def _stop(self):
+    def _kill_process(self):
         try:
-            logging.info("Closing n2n edge...")
+            logging.info("Killing n2n edge process...")
             self._process.terminate()  # 终止进程
-            self.status = Status.OFF
-            logging.info("Close n2n edge!")
+            logging.info("Kill n2n edge process!")
         except Exception as e:
             logging.error(e)
             raise CustomException("停止进程失败")
 
+    def _stop(self):
+        self.status = Status.OFF
+
     def start_thread(self):
         try:
-            self._thread = threading.Thread(target=self._run)
+            if self._thread and self._thread.is_alive():
+                return
+
+            self._thread = threading.Thread(target=self._run_process)
             self._thread.start()
         except Exception as e:
             logging.error(e)
             raise CustomException("创建线程失败")
 
     def stop_thread(self):
-        if not self._thread.is_alive():
-            raise CustomException("线程已被关闭")
-        if self.status == Status.STOPPING:
-            self._stop()
+        if not self._thread or not self._thread.is_alive():
             return
 
+        if self._process and self._process.poll() is None:
+            self._kill_process()
+
         self.status = Status.STOPPING
+        self._thread.join()
 
 
 global_n2n_edge = None

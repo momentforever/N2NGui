@@ -6,7 +6,7 @@ from src.common.custom_ini_config import CustomINIConfig
 
 class CustomConfig(CustomINIConfig):
     WORKER_DIR = None
-    EXE_SUB_PATH = "n2nGui.exe"
+    EXE_SUB_PATH = "N2NGui.exe"
     EXE_PATH = None
     EDGE_SUB_PATH = "n2n\\edge.exe"
     EDGE_PATH = None
@@ -14,7 +14,7 @@ class CustomConfig(CustomINIConfig):
     NIC_PATH = None
     CONFIG_SUB_PATH = "config.ini"
     CONFIG_PATH = None
-    LOG_SUB_PATH = "gui.log"
+    LOG_SUB_PATH = "N2NGui.log"
     LOG_PATH = None
 
     def __init__(self, path):

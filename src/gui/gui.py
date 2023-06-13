@@ -16,7 +16,8 @@ class GUI:
         # 设置图标
         icon = QIcon(os.path.join(config.WORKER_DIR, "statics\\icon_32.ico"))
         mw.setWindowIcon(icon)
-        mw.show()
+        if not config.IS_STARTUP:
+            mw.show()
 
         sys.exit(app.exec_())
 

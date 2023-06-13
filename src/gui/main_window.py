@@ -17,20 +17,81 @@ from src.tool.n2n_tool import get_n2n_edge
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        n2n_edge = get_n2n_edge()
         config = get_config()
 
         self.setWindowTitle("N2NGui")
         self.setFixedSize(800, 600)
         self.icon = QIcon(os.path.join(config.WORKER_DIR, "statics\\icon_32.ico"))
+        self.normal_icon = QIcon(os.path.join(config.WORKER_DIR, "statics\\icon_normal_48.ico"))
+        self.running_icon = QIcon(os.path.join(config.WORKER_DIR, "statics\\icon_running_48.ico"))
         # 设置窗口图标
         self.setWindowIcon(self.icon)
 
-        self.normal_icon = QIcon(os.path.join(config.WORKER_DIR, "statics\\icon_normal_48.ico"))
-        self.running_icon = QIcon(os.path.join(config.WORKER_DIR, "statics\\icon_running_48.ico"))
-
         self._init_top_bar()
         self._init_system_bar()
+        self._init_center()
+
+    def _init_top_bar(self):
+        config = get_config()
+        # 初始化 主菜单
+        self.menu_bar = self.menuBar()
+        # 初始化 选项
+        self.options_menu = QMenu("选项", self)
+        # 初始化 开启自启动
+        self.startup_action = QAction("开机自启动", self)
+        # 设置 开启自启动
+        self.startup_action.setCheckable(True)
+        self.startup_action.setChecked(config.IS_STARTUP)
+        self.startup_action.triggered.connect(self.add_startup_event)
+        # 绑定 开机自启动
+        self.options_menu.addAction(self.startup_action)
+
+        # 初始化 安装网卡
+        self.install_nic_action = QAction("安装网卡驱动", self)
+        # 设置 安装网卡
+        self.install_nic_action.triggered.connect(self.install_nic_event)
+        # 绑定 安装网卡
+        self.options_menu.addAction(self.install_nic_action)
+
+        # 绑定设置
+        self.menu_bar.addMenu(self.options_menu)
+
+    def _init_system_bar(self):
+        config = get_config()
+
+        # 创建系统托盘菜单
+        self.tray_icon = QSystemTrayIcon(self)
+        n2n_edge = get_n2n_edge()
+        if n2n_edge.status in Status.ENABLE_START:
+            self.tray_icon.setIcon(self.normal_icon)
+        else:
+            self.tray_icon.setIcon(self.running_icon)
+
+        # 创建菜单项
+        show_action = QAction("显示", self)
+        quit_action = QAction("退出", self)
+
+        # 将菜单项添加到菜单中
+        menu = QMenu()
+        menu.addAction(show_action)
+        menu.addAction(quit_action)
+
+        # 设置系统托盘菜单
+        self.tray_icon.setContextMenu(menu)
+
+        # 显示系统托盘图标
+        self.tray_icon.show()
+
+        # 连接菜单项的信号和槽函数
+        show_action.triggered.connect(self.show_event)
+        quit_action.triggered.connect(self.quit_event)
+
+        # 连接双击系统托盘图标的信号和槽函数
+        self.tray_icon.activated.connect(self.tray_icon_activated_event)
+
+    def _init_center(self):
+        n2n_edge = get_n2n_edge()
+        config = get_config()
 
         central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
@@ -77,15 +138,6 @@ class MainWindow(QMainWindow):
 
         self.log_window = LogWindow()
         layout.addWidget(self.log_window)
-
-        # # 创建 QTimer 对象
-        # self.timer = QTimer(self)
-        # # 设置定时器触发间隔，单位为毫秒
-        # self.timer.setInterval(1000)
-        # # 将定时器的 timeout 信号与更新事件的槽函数连接
-        # self.timer.timeout.connect(self.update_event)
-        # # 启动定时器
-        # self.timer.start()
 
     def start_edge_event(self):
         try:
@@ -148,72 +200,6 @@ class MainWindow(QMainWindow):
             logging.error(e)
             QMessageBox.warning(self, "错误", "未知错误")
 
-    def update_event(self):
-        n2n_edge = get_n2n_edge()
-        if n2n_edge and n2n_edge.status in Status.ENABLE_START and self.start_button.text() == "停止":
-            self.start_button.setText("启动")
-
-    def _init_top_bar(self):
-        config = get_config()
-        # 初始化 主菜单
-        self.menu_bar = self.menuBar()
-        # 初始化 选项
-        self.options_menu = QMenu("选项", self)
-        # 初始化 开启自启动
-        self.startup_action = QAction("开机自启动", self)
-        # 设置 开启自启动
-        self.startup_action.setCheckable(True)
-        self.startup_action.setChecked(config.IS_STARTUP)
-        self.startup_action.triggered.connect(self.add_startup_event)
-        # 绑定 开机自启动
-        self.options_menu.addAction(self.startup_action)
-
-        # 初始化 安装网卡
-        self.install_nic_action = QAction("安装网卡驱动", self)
-        # 设置 安装网卡
-        self.install_nic_action.triggered.connect(self.install_nic_event)
-        # 绑定 安装网卡
-        self.options_menu.addAction(self.install_nic_action)
-
-        # 绑定设置
-        self.menu_bar.addMenu(self.options_menu)
-
-    def _init_system_bar(self):
-        config = get_config()
-
-        # 创建系统托盘菜单
-        self.tray_icon = QSystemTrayIcon(self)
-        n2n_edge = get_n2n_edge()
-        if n2n_edge.status in Status.ENABLE_START:
-            self.tray_icon.setIcon(self.normal_icon)
-        else:
-            self.tray_icon.setIcon(self.running_icon)
-
-        # 创建菜单项
-        show_action = QAction("显示", self)
-        hang_up_action = QAction("挂起", self)
-        quit_action = QAction("退出", self)
-
-        # 将菜单项添加到菜单中
-        menu = QMenu()
-        menu.addAction(show_action)
-        menu.addAction(hang_up_action)
-        menu.addAction(quit_action)
-
-        # 设置系统托盘菜单
-        self.tray_icon.setContextMenu(menu)
-
-        # 显示系统托盘图标
-        self.tray_icon.show()
-
-        # 连接菜单项的信号和槽函数
-        show_action.triggered.connect(self.show_event)
-        hang_up_action.triggered.connect(self.hang_up_event)
-        quit_action.triggered.connect(self.quit_event)
-
-        # 连接双击系统托盘图标的信号和槽函数
-        self.tray_icon.activated.connect(self.tray_icon_activated_event)
-
     def show_event(self):
         # 显示主窗口
         self.show()
@@ -225,9 +211,11 @@ class MainWindow(QMainWindow):
     def quit_event(self):
         # 退出应用程序
         self.tray_icon.hide()
-        n2n_edge = get_n2n_edge()
-        if n2n_edge:
+        try:
+            n2n_edge = get_n2n_edge()
             n2n_edge.stop_thread()
+        except:
+            pass
         self.log_window.close()
         QApplication.exit()
 
