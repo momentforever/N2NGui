@@ -15,10 +15,9 @@ from src.tool.n2n_tool import get_n2n_edge
 
 
 class MainWindow(QMainWindow):
-    n2n_edge = None
-
     def __init__(self):
         super().__init__()
+        n2n_edge = get_n2n_edge()
         config = get_config()
 
         self.setWindowTitle("N2NGui")
@@ -67,7 +66,12 @@ class MainWindow(QMainWindow):
         layout.addWidget(edge_ip_label)
         layout.addWidget(self.edge_ip_entry)
 
-        self.start_button = QPushButton("启动")
+        if n2n_edge.status in Status.ENABLE_START:
+            bt = "启动"
+        else:
+            bt = "停止"
+        self.start_button = QPushButton(bt)
+
         self.start_button.clicked.connect(self.start_edge_event)
         layout.addWidget(self.start_button)
 
@@ -85,20 +89,20 @@ class MainWindow(QMainWindow):
 
     def start_edge_event(self):
         try:
-            self.n2n_edge = get_n2n_edge()
+            n2n_edge = get_n2n_edge()
             config = get_config()
-            if self.n2n_edge.status in Status.ENABLE_START:
+            if n2n_edge.status in Status.ENABLE_START:
                 config.SUPERNODE = self.supernode_entry.text()
                 config.EDGE_IP = self.edge_ip_entry.text()
                 config.EDGE_COMMUNITY = self.edge_community_entry.text()
                 config.EDGE_COMMUNITY_PASSWORD = self.edge_community_password_entry.text()
 
-                self.n2n_edge.start_thread()
+                n2n_edge.start_thread()
                 config.write_to_config()
                 self.start_button.setText("停止")
                 self.tray_icon.setIcon(self.running_icon)
             else:
-                self.n2n_edge.stop_thread()
+                n2n_edge.stop_thread()
                 self.start_button.setText("启动")
                 self.tray_icon.setIcon(self.normal_icon)
         except CustomException as e:
@@ -145,7 +149,8 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "错误", "未知错误")
 
     def update_event(self):
-        if self.n2n_edge and self.n2n_edge.status in Status.ENABLE_START and self.start_button.text() == "停止":
+        n2n_edge = get_n2n_edge()
+        if n2n_edge and n2n_edge.status in Status.ENABLE_START and self.start_button.text() == "停止":
             self.start_button.setText("启动")
 
     def _init_top_bar(self):
@@ -178,7 +183,11 @@ class MainWindow(QMainWindow):
 
         # 创建系统托盘菜单
         self.tray_icon = QSystemTrayIcon(self)
-        self.tray_icon.setIcon(self.normal_icon)
+        n2n_edge = get_n2n_edge()
+        if n2n_edge.status in Status.ENABLE_START:
+            self.tray_icon.setIcon(self.normal_icon)
+        else:
+            self.tray_icon.setIcon(self.running_icon)
 
         # 创建菜单项
         show_action = QAction("显示", self)
@@ -216,8 +225,9 @@ class MainWindow(QMainWindow):
     def quit_event(self):
         # 退出应用程序
         self.tray_icon.hide()
-        if self.n2n_edge:
-            self.n2n_edge.stop_thread()
+        n2n_edge = get_n2n_edge()
+        if n2n_edge:
+            n2n_edge.stop_thread()
         self.log_window.close()
         QApplication.exit()
 
