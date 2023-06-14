@@ -9,9 +9,6 @@ class LogWindow(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("Log Window")
-        self.resize(800, 600)
-
         layout = QVBoxLayout(self)
 
         self.text_box = QTextEdit(self)

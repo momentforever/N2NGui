@@ -6,12 +6,14 @@ import time
 from src.common.custom_config import get_config, CustomConfig
 from src.common.custom_const import Status
 from src.common.custom_exception import CustomException
+from src.common.custom_handler import CustomHandlers
 from src.common.custom_logging import get_logging
 
 
 class N2NEdge:
+    start_handlers: CustomHandlers = None
+    stop_handlers: CustomHandlers = None
     status: Status = Status.OFF
-
     _config: CustomConfig = None
     _thread = None
     _process = None
@@ -21,13 +23,15 @@ class N2NEdge:
         if self.status not in Status.ENABLE_START:
             raise CustomException("已经启动")
 
+        self.start_handlers = CustomHandlers()
+        self.stop_handlers = CustomHandlers()
+
         self.status = Status.OFF
         self._config = get_config()
         if not self._log_fd:
             self._log_fd = get_logging().write_fd
         self._thread = None
         self._process = None
-
 
     def _generate_cmd(self):
         cmd = []
@@ -67,6 +71,7 @@ class N2NEdge:
         # 构建 n2n Edge 程序的命令行参数
         edge_cmd = self._generate_cmd()
         logging.info("Starting n2n edge...")
+        self.start_handlers.exec()
         self.status = Status.STARTING
         self._process = subprocess.Popen(edge_cmd,
                                          stdout=self._log_fd,
@@ -94,6 +99,7 @@ class N2NEdge:
 
     def _stop(self):
         self.status = Status.OFF
+        self.stop_handlers.exec()
 
     def start_thread(self):
         try:

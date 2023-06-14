@@ -1,14 +1,15 @@
 import logging
 import os
 
-from PyQt5.QtCore import QTimer
+from qt_material import apply_stylesheet
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QLabel, QLineEdit, QPushButton, QMessageBox, QVBoxLayout, \
-    QWidget, QAction, QMenu, QSystemTrayIcon, QApplication
+    QWidget, QAction, QMenu, QSystemTrayIcon, QApplication, QSizePolicy, QHBoxLayout
 from src.common.custom_config import get_config
 from src.common.custom_const import Status
 from src.common.custom_exception import CustomException
 from src.gui.log_window import LogWindow
+from src.gui.n2n_window import N2NWindow
 from src.tool.nic_tool import install_nic
 from src.tool.startup_tool import add_to_startup, delete_from_startup
 from src.tool.n2n_tool import get_n2n_edge
@@ -19,8 +20,13 @@ class MainWindow(QMainWindow):
         super().__init__()
         config = get_config()
 
+        # 应用 Qt-Material 主题
+        apply_stylesheet(self, theme='light_cyan_500.xml')
+
         self.setWindowTitle("N2NGui")
-        self.setFixedSize(800, 600)
+
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
         self.icon = QIcon(os.path.join(config.WORKER_DIR, "statics\\icon_32.ico"))
         self.normal_icon = QIcon(os.path.join(config.WORKER_DIR, "statics\\icon_normal_48.ico"))
         self.running_icon = QIcon(os.path.join(config.WORKER_DIR, "statics\\icon_running_48.ico"))
@@ -30,6 +36,9 @@ class MainWindow(QMainWindow):
         self._init_top_bar()
         self._init_system_bar()
         self._init_center()
+
+        if not config.IS_STARTUP:
+            self.show()
 
     def _init_top_bar(self):
         config = get_config()
@@ -53,19 +62,30 @@ class MainWindow(QMainWindow):
         # 绑定 安装网卡
         self.options_menu.addAction(self.install_nic_action)
 
+        # 初始化 退出
+        self.close_action = QAction("退出", self)
+        # 设置 退出
+        self.close_action.triggered.connect(self.quit_event)
+        # 绑定 退出
+        self.options_menu.addAction(self.close_action)
+
         # 绑定设置
         self.menu_bar.addMenu(self.options_menu)
 
     def _init_system_bar(self):
         config = get_config()
+        n2n_edge = get_n2n_edge()
 
         # 创建系统托盘菜单
         self.tray_icon = QSystemTrayIcon(self)
-        n2n_edge = get_n2n_edge()
+
+        # 初始化图标
         if n2n_edge.status in Status.ENABLE_START:
             self.tray_icon.setIcon(self.normal_icon)
         else:
             self.tray_icon.setIcon(self.running_icon)
+        # n2n_edge.start_handlers.register(self.start_n2n_handler)
+        # n2n_edge.stop_handlers.register(self.stop_n2n_handler)
 
         # 创建菜单项
         show_action = QAction("显示", self)
@@ -90,78 +110,15 @@ class MainWindow(QMainWindow):
         self.tray_icon.activated.connect(self.tray_icon_activated_event)
 
     def _init_center(self):
-        n2n_edge = get_n2n_edge()
-        config = get_config()
-
         central_widget = QWidget(self)
+
         self.setCentralWidget(central_widget)
+        layout = QHBoxLayout(central_widget)
 
-        layout = QVBoxLayout(central_widget)
-
-        supernode_label = QLabel("超级节点地址和端口*：")
-        self.supernode_entry = QLineEdit()
-        if config.SUPERNODE:
-            self.supernode_entry.setText(config.SUPERNODE)
-        layout.addWidget(supernode_label)
-        layout.addWidget(self.supernode_entry)
-
-        edge_community_label = QLabel("小组名称*：")
-        self.edge_community_entry = QLineEdit()
-        if config.EDGE_COMMUNITY:
-            self.edge_community_entry.setText(config.EDGE_COMMUNITY)
-        layout.addWidget(edge_community_label)
-        layout.addWidget(self.edge_community_entry)
-
-        edge_community_password_label = QLabel("小组密码：")
-        self.edge_community_password_entry = QLineEdit()
-        self.edge_community_password_entry.setEchoMode(QLineEdit.Password)
-        if config.EDGE_COMMUNITY_PASSWORD:
-            self.edge_community_password_entry.setText(config.EDGE_COMMUNITY_PASSWORD)
-        layout.addWidget(edge_community_password_label)
-        layout.addWidget(self.edge_community_password_entry)
-
-        edge_ip_label = QLabel("Edge IP 地址：")
-        self.edge_ip_entry = QLineEdit()
-        if config.EDGE_IP:
-            self.edge_ip_entry.setText(config.EDGE_IP)
-        layout.addWidget(edge_ip_label)
-        layout.addWidget(self.edge_ip_entry)
-
-        if n2n_edge.status in Status.ENABLE_START:
-            bt = "启动"
-        else:
-            bt = "停止"
-        self.start_button = QPushButton(bt)
-
-        self.start_button.clicked.connect(self.start_edge_event)
-        layout.addWidget(self.start_button)
-
+        self.n2n_window = N2NWindow()
+        layout.addWidget(self.n2n_window)
         self.log_window = LogWindow()
         layout.addWidget(self.log_window)
-
-    def start_edge_event(self):
-        try:
-            n2n_edge = get_n2n_edge()
-            config = get_config()
-            if n2n_edge.status in Status.ENABLE_START:
-                config.SUPERNODE = self.supernode_entry.text()
-                config.EDGE_IP = self.edge_ip_entry.text()
-                config.EDGE_COMMUNITY = self.edge_community_entry.text()
-                config.EDGE_COMMUNITY_PASSWORD = self.edge_community_password_entry.text()
-
-                n2n_edge.start_thread()
-                config.write_to_config()
-                self.start_button.setText("停止")
-                self.tray_icon.setIcon(self.running_icon)
-            else:
-                n2n_edge.stop_thread()
-                self.start_button.setText("启动")
-                self.tray_icon.setIcon(self.normal_icon)
-        except CustomException as e:
-            QMessageBox.information(self, "错误", e.args[0])
-        except Exception as e:
-            logging.error(e)
-            QMessageBox.information(self, "错误", "未知错误")
 
     def add_startup_event(self):
         try:
@@ -227,3 +184,9 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         event.ignore()
         self.hang_up_event()
+
+    def stop_n2n_handler(self):
+        self.tray_icon.setIcon(self.normal_icon)
+
+    def start_n2n_handler(self):
+        self.tray_icon.setIcon(self.running_icon)
