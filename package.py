@@ -48,6 +48,8 @@ shutil.copytree("n2n", os.path.join(package_dir, "n2n"))
 shutil.copytree("tools", os.path.join(package_dir, "tools"))
 shutil.copy(os.path.join(".\\dist", f"{project_name}.exe"), package_dir)
 
+if os.path.exists(f'.\\{project_name}.zip'):
+    os.remove(f'.\\{project_name}.zip')
 # 压缩文件
 compress_folder(package_dir, f'.\\{project_name}.zip')
 
