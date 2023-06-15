@@ -6,7 +6,9 @@ dist/
 build/
 *.spec
 
-package/
 *.log
 *.ini
 *.json
+
+N2NGui/
+N2NGui.zip

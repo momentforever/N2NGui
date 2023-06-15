@@ -3,11 +3,26 @@ import shutil
 
 import PyInstaller.__main__
 
+import zipfile
+
+
+def compress_folder(folder_path, zip_path):
+    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        # 遍历文件夹中的所有文件和子文件夹
+        for root, dirs, files in os.walk(folder_path):
+            for file in files:
+                # 构建文件的绝对路径
+                file_path = os.path.join(root, file)
+                # 计算文件在 ZIP 文件中的相对路径
+                relative_path = os.path.relpath(file_path, folder_path)
+                # 将文件写入 ZIP 文件中
+                zipf.write(file_path, arcname=relative_path)
+
 # 源代码文件
 worker_dir = os.getcwd()
 source_file = 'main.py'
 project_name = 'N2NGui'
-package_dir = ".\\package"
+package_dir = ".\\N2NGui"
 icon_file = ".\\statics\\icon_48.ico"
 
 options = [
@@ -27,13 +42,18 @@ if os.path.exists(package_dir):
     shutil.rmtree(package_dir)
 os.mkdir(package_dir)
 
+# 拷贝文件
 shutil.copytree("statics", os.path.join(package_dir, "statics"))
 shutil.copytree("n2n", os.path.join(package_dir, "n2n"))
 shutil.copytree("tools", os.path.join(package_dir, "tools"))
 shutil.copy(os.path.join(".\\dist", f"{project_name}.exe"), package_dir)
 
+# 压缩文件
+compress_folder(package_dir, f'.\\{project_name}.zip')
+
 # 删除不需要的中间内容
 delete_files = [
+    package_dir,
     f'.\\{project_name}.spec',  # 生成的 .spec 文件
     '.\\build',  # 生成的 build 目录
     '.\\dist',  # 生成的 dist 目录
