@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 
 from qt_material import apply_stylesheet
 from PyQt5.QtGui import QIcon
@@ -11,7 +12,7 @@ from src.gui.log_window import LogWindow
 from src.gui.n2n_window import N2NWindow
 from src.gui.quick_start_window import QuickStartWindow
 from src.tool.nic_tool import install_nic
-from src.tool.startup_tool import add_to_startup, delete_from_startup
+from src.tool.startup_tool import add_to_startup, delete_from_startup, is_admin
 from src.tool.n2n_tool import get_n2n_edge
 
 
@@ -47,6 +48,13 @@ class MainWindow(QMainWindow):
             n2n_edge.start_thread()
         else:
             if not config.IS_QS:
+                if not is_admin():
+                    self.box = QMessageBox()
+                    result = self.box.critical(self, "错误", "首次请以管理员方式启动")
+                    # 当用户点击“确定”按钮时，退出程序
+                    if result == QMessageBox.Ok:
+                        self.quit_event()
+                        sys.exit()
                 self.quick_start = QuickStartWindow()
             self.show()
 
