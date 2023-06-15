@@ -1,7 +1,9 @@
 import logging
 import threading
 import time
-from PyQt5.QtWidgets import QTextEdit, QWidget, QVBoxLayout
+from PyQt5.QtWidgets import QTextEdit, QWidget, QVBoxLayout, QSizePolicy
+from qt_material import apply_stylesheet
+
 from src.common.custom_config import get_config
 
 
@@ -9,9 +11,14 @@ class LogWindow(QWidget):
     def __init__(self):
         super().__init__()
 
+        # 应用 Qt-Material 主题
+        apply_stylesheet(self, theme='light_cyan_500.xml')
+
         layout = QVBoxLayout(self)
 
         self.text_box = QTextEdit(self)
+        self.text_box.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+
         self.text_box.setReadOnly(True)
         layout.addWidget(self.text_box)
 
@@ -21,6 +28,8 @@ class LogWindow(QWidget):
         self.is_running = True
         self.worker_thread = threading.Thread(target=self.log_worker)
         self.worker_thread.start()
+
+        self.resize(self.sizeHint())
 
     def append_log(self, log):
         self.text_box.append(log)

@@ -10,6 +10,7 @@ from src.common.custom_handler import CustomHandlers
 from src.common.custom_logging import get_logging
 
 
+# 单例模式
 class N2NEdge:
     start_handlers: CustomHandlers = None
     stop_handlers: CustomHandlers = None
@@ -60,6 +61,18 @@ class N2NEdge:
         if self._config.EDGE_PACKAGE_SIZE:
             cmd.append("-M")
             cmd.append(self._config.EDGE_PACKAGE_SIZE)
+
+        if self._config.EDGE_DESCRIPTION:
+            cmd.append("-I")
+            cmd.append(self._config.EDGE_DESCRIPTION)
+
+        if self._config.EDGE_ETC_ARGS:
+            edge_etc_args = self._config.EDGE_ETC_ARGS.split("\n")
+            for edge_etc_arg in edge_etc_args:
+                edge_etc_arg = edge_etc_arg.split("#")[0]
+                if not edge_etc_arg:
+                    continue
+                cmd += edge_etc_arg.split(" ")
 
         logging.debug("Start n2n edge command is {0}".format(" ".join(cmd)))
         return cmd

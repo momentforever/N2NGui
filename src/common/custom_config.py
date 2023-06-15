@@ -1,10 +1,11 @@
 import os
 
 from src.common.custom_exception import CustomException
-from src.common.custom_ini_config import CustomINIConfig
+from src.common.custom_json_config import CustomJSONConfig
 
 
-class CustomConfig(CustomINIConfig):
+# 单例模式
+class CustomConfig(CustomJSONConfig):
     WORKER_DIR = None
     EXE_SUB_PATH = "N2NGui.exe"
     EXE_PATH = None
@@ -12,7 +13,7 @@ class CustomConfig(CustomINIConfig):
     EDGE_PATH = None
     NIC_SUB_PATH = "tools\\tap-windows\\9.21.2.exe"
     NIC_PATH = None
-    CONFIG_SUB_PATH = "config.ini"
+    CONFIG_SUB_PATH = "config.json"
     CONFIG_PATH = None
     LOG_SUB_PATH = "N2NGui.log"
     LOG_PATH = None

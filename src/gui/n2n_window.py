@@ -1,15 +1,21 @@
 import logging
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QMessageBox, QVBoxLayout, \
     QWidget
+from qt_material import apply_stylesheet
+
 from src.common.custom_config import get_config
 from src.common.custom_const import Status
 from src.common.custom_exception import CustomException
+from src.gui.advanced_setting_window import AdvancedSettingWindow
 from src.tool.n2n_tool import get_n2n_edge
 
 
 class N2NWindow(QWidget):
     def __init__(self):
         super().__init__()
+
+        # 应用 Qt-Material 主题
+        apply_stylesheet(self, theme='light_cyan_500.xml')
 
         n2n_edge = get_n2n_edge()
         config = get_config()
@@ -45,21 +51,19 @@ class N2NWindow(QWidget):
         layout.addWidget(edge_ip_label)
         layout.addWidget(self.edge_ip_entry)
 
-        if n2n_edge.status in Status.ENABLE_START:
-            self.start_button = QPushButton("启动")
-        else:
-            self.start_button = QPushButton("停止")
-        n2n_edge.start_handlers.register(self.start_n2n_handler)
-        print(len(n2n_edge.start_handlers._handlers))
-        n2n_edge.stop_handlers.register(self.stop_n2n_handler)
-        print(len(n2n_edge.start_handlers._handlers))
+        self.start_button = QPushButton("启动")
 
         self.start_button.clicked.connect(self.start_edge_event)
         layout.addWidget(self.start_button)
 
         self.advanced_settings_button = QPushButton("高级设置")
-        self.advanced_settings_button.clicked.connect(self.show_advanced_setting)
+        self.advanced_settings_button.clicked.connect(self.show_advanced_setting_event)
         layout.addWidget(self.advanced_settings_button)
+
+        self.advanced_settings_window = AdvancedSettingWindow()
+
+        n2n_edge.start_handlers.register(self.start_n2n_handler)
+        n2n_edge.stop_handlers.register(self.stop_n2n_handler)
 
     def start_edge_event(self):
         try:
@@ -77,13 +81,13 @@ class N2NWindow(QWidget):
             else:
                 n2n_edge.stop_thread()
         except CustomException as e:
-            QMessageBox.information(self, "错误", e.args[0])
+            QMessageBox.warning(self, "错误", e.args[0])
         except Exception as e:
             logging.error(e)
-            QMessageBox.information(self, "错误", "未知错误")
+            QMessageBox.warning(self, "错误", "未知错误")
 
-    def show_advanced_setting(self):
-        pass
+    def show_advanced_setting_event(self):
+        self.advanced_settings_window.show()
 
     def start_n2n_handler(self):
         self.start_button.setText("停止")

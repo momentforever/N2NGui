@@ -3,13 +3,13 @@ import os
 
 from qt_material import apply_stylesheet
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMainWindow, QLabel, QLineEdit, QPushButton, QMessageBox, QVBoxLayout, \
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, \
     QWidget, QAction, QMenu, QSystemTrayIcon, QApplication, QSizePolicy, QHBoxLayout
 from src.common.custom_config import get_config
-from src.common.custom_const import Status
 from src.common.custom_exception import CustomException
 from src.gui.log_window import LogWindow
 from src.gui.n2n_window import N2NWindow
+from src.gui.quick_start_window import QuickStartWindow
 from src.tool.nic_tool import install_nic
 from src.tool.startup_tool import add_to_startup, delete_from_startup
 from src.tool.n2n_tool import get_n2n_edge
@@ -18,26 +18,36 @@ from src.tool.n2n_tool import get_n2n_edge
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        config = get_config()
 
         # 应用 Qt-Material 主题
         apply_stylesheet(self, theme='light_cyan_500.xml')
 
+        config = get_config()
+        n2n_edge = get_n2n_edge()
+
         self.setWindowTitle("N2NGui")
-
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
         self.icon = QIcon(os.path.join(config.WORKER_DIR, "statics\\icon_32.ico"))
         self.normal_icon = QIcon(os.path.join(config.WORKER_DIR, "statics\\icon_normal_48.ico"))
         self.running_icon = QIcon(os.path.join(config.WORKER_DIR, "statics\\icon_running_48.ico"))
         # 设置窗口图标
         self.setWindowIcon(self.icon)
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
 
         self._init_top_bar()
         self._init_system_bar()
         self._init_center()
 
-        if not config.IS_STARTUP:
+        # 设置窗口默认大小
+        screen_resolution = QApplication.desktop().screenGeometry()
+        width, height = screen_resolution.width() * 0.4, screen_resolution.height() * 0.3
+        self.resize(int(width), int(height))
+
+        if config.IS_STARTUP:
+            # 开机自启动
+            n2n_edge.start_thread()
+        else:
+            if not config.IS_QS:
+                self.quick_start = QuickStartWindow()
             self.show()
 
     def _init_top_bar(self):
@@ -79,13 +89,7 @@ class MainWindow(QMainWindow):
         # 创建系统托盘菜单
         self.tray_icon = QSystemTrayIcon(self)
 
-        # 初始化图标
-        if n2n_edge.status in Status.ENABLE_START:
-            self.tray_icon.setIcon(self.normal_icon)
-        else:
-            self.tray_icon.setIcon(self.running_icon)
-        # n2n_edge.start_handlers.register(self.start_n2n_handler)
-        # n2n_edge.stop_handlers.register(self.stop_n2n_handler)
+        self.tray_icon.setIcon(self.normal_icon)
 
         # 创建菜单项
         show_action = QAction("显示", self)
@@ -109,6 +113,9 @@ class MainWindow(QMainWindow):
         # 连接双击系统托盘图标的信号和槽函数
         self.tray_icon.activated.connect(self.tray_icon_activated_event)
 
+        n2n_edge.start_handlers.register(self.start_n2n_handler)
+        n2n_edge.stop_handlers.register(self.stop_n2n_handler)
+
     def _init_center(self):
         central_widget = QWidget(self)
 
@@ -116,9 +123,9 @@ class MainWindow(QMainWindow):
         layout = QHBoxLayout(central_widget)
 
         self.n2n_window = N2NWindow()
-        layout.addWidget(self.n2n_window)
+        layout.addWidget(self.n2n_window, 2)
         self.log_window = LogWindow()
-        layout.addWidget(self.log_window)
+        layout.addWidget(self.log_window, 5)
 
     def add_startup_event(self):
         try:

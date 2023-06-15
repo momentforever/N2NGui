@@ -12,7 +12,9 @@ class CustomINIConfig:
     EDGE_IP = ""
     EDGE_COMMUNITY = ""
     EDGE_COMMUNITY_PASSWORD = ""
-    EDGE_PACKAGE_SIZE = 1386
+    EDGE_PACKAGE_SIZE = "1386"
+    EDGE_DESCRIPTION = ""
+    EDGE_ETC_ARGS = ""
 
     def __init__(self, path):
         if not os.path.exists(path):
@@ -30,7 +32,7 @@ class CustomINIConfig:
                     if attr.startswith("IS_"):
                         setattr(CustomINIConfig, attr, config_section.getboolean(attr, getattr(self, attr)))
                     else:
-                        setattr(CustomINIConfig, attr, config_section.get(attr, getattr(self, attr)))
+                        setattr(CustomINIConfig, attr, str(config_section.get(attr, getattr(self, attr))))
 
     def _write_to_config(self, path):
         config = configparser.ConfigParser()
