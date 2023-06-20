@@ -7,6 +7,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, \
     QWidget, QAction, QMenu, QSystemTrayIcon, QApplication, QSizePolicy, QHBoxLayout
 from src.common.custom_config import get_config
+from src.common.custom_const import Status
 from src.common.custom_exception import CustomException
 from src.gui.log_window import LogWindow
 from src.gui.n2n_window import N2NWindow
@@ -148,6 +149,8 @@ class MainWindow(QMainWindow):
         is_success = False
         try:
             if self.startup_action.isChecked():
+                if get_n2n_edge().status != Status.ON:
+                    raise CustomException("请在运行N2N Edge后设置开启自启动")
                 add_to_startup()
             else:
                 delete_from_startup()
