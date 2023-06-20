@@ -7,11 +7,6 @@ from src.tool.n2n_tool import init_n2n_edge
 from src.gui.gui import GUI
 
 
-# TODO 2.优化参数校验
-# TODO 4.优化UI
-# TODO 5.单元测试
-# TODO 8.高级参数
-
 def get_executable_path():
     if getattr(sys, 'frozen', False):
         # 返回打包后可执行文件的路径
