@@ -16,6 +16,8 @@ class CustomJSONConfig:
     EDGE_DESCRIPTION = ""
     EDGE_ETC_ARGS = ""
 
+    IS_UNLESS_STOP = False
+
     def __init__(self, path):
         if not os.path.exists(path):
             self._write_to_config(path)

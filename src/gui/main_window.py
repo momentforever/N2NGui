@@ -73,6 +73,15 @@ class MainWindow(QMainWindow):
         # 绑定 开机自启动
         self.options_menu.addAction(self.startup_action)
 
+        # 初始化 开启自启动
+        self.auto_restart_action = QAction("自动异常重启", self)
+        # 设置 开启自启动
+        self.auto_restart_action.setCheckable(True)
+        self.auto_restart_action.setChecked(config.IS_UNLESS_STOP)
+        self.auto_restart_action.triggered.connect(self.auto_restart_event)
+        # 绑定 开机自启动
+        self.options_menu.addAction(self.auto_restart_action)
+
         # 初始化 安装网卡
         self.install_nic_action = QAction("安装网卡驱动", self)
         # 设置 安装网卡
@@ -136,32 +145,25 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.log_window, 5)
 
     def add_startup_event(self):
+        is_success = False
         try:
-            is_success = False
-            try:
-                if self.startup_action.isChecked():
-                    add_to_startup()
-                else:
-                    delete_from_startup()
-                # 写入配置文件
-                config = get_config()
-                config.IS_STARTUP = self.startup_action.isChecked()
-                config.write_to_config()
-                is_success = True
-            except CustomException as e:
-                QMessageBox.warning(self, "错误", e.args[0])
-            except Exception as e:
-                logging.error(e)
-                QMessageBox.warning(self, "错误", "未知错误")
-
-            if not is_success:
-                self.startup_action.setChecked(not self.startup_action.isChecked())
-
+            if self.startup_action.isChecked():
+                add_to_startup()
+            else:
+                delete_from_startup()
+            # 写入配置文件
+            config = get_config()
+            config.IS_STARTUP = self.startup_action.isChecked()
+            config.write_to_config()
+            is_success = True
         except CustomException as e:
             QMessageBox.warning(self, "错误", e.args[0])
         except Exception as e:
             logging.error(e)
             QMessageBox.warning(self, "错误", "未知错误")
+
+        if not is_success:
+            self.startup_action.setChecked(not self.startup_action.isChecked())
 
     def install_nic_event(self):
         try:
@@ -171,6 +173,22 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logging.error(e)
             QMessageBox.warning(self, "错误", "未知错误")
+
+    def auto_restart_event(self):
+        is_success = False
+        try:
+            config = get_config()
+            config.IS_UNLESS_STOP = self.auto_restart_action.isChecked()
+            config.write_to_config()
+            is_success = True
+        except CustomException as e:
+            QMessageBox.warning(self, "错误", e.args[0])
+        except Exception as e:
+            logging.error(e)
+            QMessageBox.warning(self, "错误", "未知错误")
+
+        if not is_success:
+            self.auto_restart_action.setChecked(not self.auto_restart_action.isChecked())
 
     def show_event(self):
         # 显示主窗口

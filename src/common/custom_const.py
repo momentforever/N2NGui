@@ -4,6 +4,7 @@ class Status:
     STARTING = 1
     ON = 2
     STOPPING = 3
+    KILLED = 4
 
     ENABLE_STOP = [ON]
     ENABLE_START = [UNKNOWN, OFF]

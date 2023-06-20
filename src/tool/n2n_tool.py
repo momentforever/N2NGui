@@ -9,6 +9,7 @@ from src.common.custom_exception import CustomException
 from src.common.custom_handler import CustomHandlers
 from src.common.custom_logging import get_logging
 
+MAX_RESTART_CNT = 255
 
 # 单例模式
 class N2NEdge:
@@ -19,6 +20,7 @@ class N2NEdge:
     _thread = None
     _process = None
     _log_fd = None
+    restart_cnt = 0
 
     def __init__(self):
         if self.status not in Status.ENABLE_START:
@@ -84,22 +86,42 @@ class N2NEdge:
         # 构建 n2n Edge 程序的命令行参数
         edge_cmd = self._generate_cmd()
         logging.info("Starting n2n edge...")
-        self.start_handlers.exec()
         self.status = Status.STARTING
-        self._process = subprocess.Popen(edge_cmd,
-                                         stdout=self._log_fd,
-                                         stderr=self._log_fd,
-                                         creationflags=subprocess.CREATE_NO_WINDOW)
-        self.status = Status.ON
-        logging.info("Start n2n edge!")
+        self.start_handlers.exec()
 
         while True:
-            # 监控进程异常是否挂掉
-            if self._process.poll() is not None:
-                self.status = Status.STOPPING
+            self._process = subprocess.Popen(edge_cmd,
+                                             stdout=self._log_fd,
+                                             stderr=self._log_fd,
+                                             creationflags=subprocess.CREATE_NO_WINDOW)
+            self.status = Status.ON
+            logging.info("Start n2n edge!")
+
+            while True:
+                # 监控进程异常是否挂掉
+                if self._process.poll() is not None:
+                    break
+                time.sleep(0.1)  # 等待
+
+            if not self._config.IS_UNLESS_STOP:
+                self.restart_cnt = 0
                 break
-            time.sleep(0.1)  # 等待
-        self._stop()
+
+            if self.status == Status.KILLED:
+                self.restart_cnt = 0
+                break
+
+            logging.error(f"Abnormal termination, restart count: {self.restart_cnt}!")
+
+            if self.restart_cnt > MAX_RESTART_CNT:
+                logging.critical("Restart error, reaching the upper limit!")
+                self.restart_cnt = 0
+                break
+
+            self.restart_cnt += 1
+
+        self.stop_handlers.exec()
+        self.status = Status.OFF
 
     def _kill_process(self):
         try:
@@ -109,10 +131,6 @@ class N2NEdge:
         except Exception as e:
             logging.error(e)
             raise CustomException("停止进程失败")
-
-    def _stop(self):
-        self.status = Status.OFF
-        self.stop_handlers.exec()
 
     def start_thread(self):
         try:
@@ -129,10 +147,11 @@ class N2NEdge:
         if not self._thread or not self._thread.is_alive():
             return
 
+        self.status = Status.KILLED
+
         if self._process and self._process.poll() is None:
             self._kill_process()
 
-        self.status = Status.STOPPING
         self._thread.join()
 
 
