@@ -13,7 +13,7 @@ class Logger(metaclass=Singleton):
     日志模块
     """
     def __init__(self):
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger("N2NGui")
         self.logger.setLevel(level=logging.DEBUG)
         format_str = "[%(asctime)s] [%(levelname)s] - %(message)s"
         format_datafmt = '%Y-%m-%d %H:%M:%S'

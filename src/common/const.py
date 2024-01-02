@@ -42,10 +42,11 @@ class Path:
     if getattr(sys, 'frozen', False):
         # 返回打包后可执行文件的路径
         EXE_PATH = os.path.realpath(sys.executable)
+        WORKER_DIR = os.path.dirname(EXE_PATH)
     else:
         # 返回原始脚本文件的路径
         EXE_PATH = os.path.realpath(__file__)
-    WORKER_DIR = os.path.dirname(EXE_PATH)
+        WORKER_DIR = os.path.dirname(os.path.dirname(os.path.dirname(EXE_PATH)))
     EDGE_PATH = os.path.join(WORKER_DIR, "tools\\n2n\\edge.exe")
     CONFIG_PATH = os.path.join(WORKER_DIR, "config.yaml")
     LOG_PATH = os.path.join(WORKER_DIR, "N2NGui.log")

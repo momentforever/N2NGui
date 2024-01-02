@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QTextEdit, QWidget, QVBoxLayout, QSizePolicy
 from qt_material import apply_stylesheet
 
 
-class LogMointorView(QWidget):
+class LogMonitorView(QWidget):
     def __init__(self):
         super().__init__()
 

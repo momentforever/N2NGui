@@ -1,10 +1,10 @@
 import os
 import sys
 
-from qt_material import apply_stylesheet
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, \
     QWidget, QAction, QMenu, QSystemTrayIcon, QApplication, QSizePolicy, QHBoxLayout
+from qt_material import apply_stylesheet
 
 from src.common.const import *
 

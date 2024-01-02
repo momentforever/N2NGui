@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QTextEdit, QWidget, QVBoxLayout, QSizePolicy
 from qt_material import apply_stylesheet
 
 from src.common.const import *
-from src.view.log_monitor import LogMointorView
+from src.view.log_monitor import LogMonitorView
 
 class LogMonitorThread(QThread):
     update_signal = pyqtSignal(str)
@@ -22,7 +22,7 @@ class LogMonitorThread(QThread):
 
 class LoggerMonitorController:
     def __init__(self):
-        self.view = LogMointorView()
+        self.view = LogMonitorView()
         self.file_monitor_thread = LogMonitorThread()
         self.file_monitor_thread.update_signal.connect(self.append_log)
         self.file_monitor_thread.start()
