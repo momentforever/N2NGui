@@ -7,6 +7,9 @@ from PyQt5.QtWidgets import QMainWindow, QMessageBox, \
 from qt_material import apply_stylesheet
 
 from src.common.const import *
+from src.view.log_monitor import LogMonitorView
+from src.view.n2n_edge import N2NEdgeView
+
 
 class MainWindowView(QMainWindow):
     def __init__(self):
@@ -63,16 +66,16 @@ class MainWindowView(QMainWindow):
         self.tray_icon.setIcon(self.normal_icon)
 
         # 创建菜单项
-        show_action = QAction("显示", self)
-        quit_action = QAction("退出", self)
+        self.show_action = QAction("显示", self)
+        self.quit_action = QAction("退出", self)
 
         # 将菜单项添加到菜单中
-        menu = QMenu()
-        menu.addAction(show_action)
-        menu.addAction(quit_action)
+        self.menu = QMenu()
+        self.menu.addAction(self.show_action)
+        self.menu.addAction(self.quit_action)
 
         # 设置系统托盘菜单
-        self.tray_icon.setContextMenu(menu)
+        self.tray_icon.setContextMenu(self.menu)
 
         # 显示系统托盘图标
         self.tray_icon.show()
@@ -81,9 +84,7 @@ class MainWindowView(QMainWindow):
         central_widget = QWidget(self)
 
         self.setCentralWidget(central_widget)
-        layout = QHBoxLayout(central_widget)
+        self.center_layout = QHBoxLayout(central_widget)
+        self.n2n_edge_window = None
+        self.log_monitor_window = None
 
-        self.n2n_edge_window = QWidget()
-        layout.addWidget(self.n2n_edge_window, 2)
-        self.log_monitor_window = QWidget()
-        layout.addWidget(self.log_monitor_window, 5)

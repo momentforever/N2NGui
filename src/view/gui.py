@@ -5,6 +5,6 @@ from src.controller.main_window import MainWindowController
 
 class GUI:
     def run(self):
-        app = QApplication(sys.argv)
-        MainWindowController()
+        app = QApplication([])
+        window = MainWindowController()
         sys.exit(app.exec_())

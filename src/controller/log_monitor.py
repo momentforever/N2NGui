@@ -23,9 +23,9 @@ class LogMonitorThread(QThread):
 class LoggerMonitorController:
     def __init__(self):
         self.view = LogMonitorView()
-        self.file_monitor_thread = LogMonitorThread()
-        self.file_monitor_thread.update_signal.connect(self.append_log)
-        self.file_monitor_thread.start()
+        self.log_monitor_thread = LogMonitorThread()
+        self.log_monitor_thread.update_signal.connect(self.append_log)
+        self.log_monitor_thread.start()
 
     def append_log(self, log):
         self.view.text_box.append(log)
