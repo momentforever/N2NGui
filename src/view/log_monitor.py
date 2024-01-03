@@ -1,16 +1,8 @@
-import logging
-import threading
-import time
 from PyQt5.QtWidgets import QTextEdit, QWidget, QVBoxLayout, QSizePolicy
-from qt_material import apply_stylesheet
-
 
 class LogMonitorView(QWidget):
     def __init__(self):
         super().__init__()
-
-        # 应用 Qt-Material 主题
-        apply_stylesheet(self, theme='light_cyan_500.xml')
 
         layout = QVBoxLayout(self)
 

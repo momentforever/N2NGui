@@ -13,21 +13,17 @@ from src.controller.log_monitor import LoggerMonitorController
 from src.controller.n2n_edge import N2NEdgeController
 
 class MainWindowController:
-    def __init__(self):
+    def __init__(self, view: MainWindowView):
         # model
         self.config = Config()
         self.startup_tool = StartupTool()
         self.nic_tool = NicTool()
-        # 主窗口
-        self.view = MainWindowView()
-        # 子窗口
-        self.log_monitor = LoggerMonitorController()
-        self.n2n_edge = N2NEdgeController()
+        # view
+        self.view = view
 
-        self.view.n2n_edge_window = self.n2n_edge.view
-        self.view.center_layout.addWidget(self.view.n2n_edge_window, 2)
-        self.view.log_monitor_window = self.log_monitor.view
-        self.view.center_layout.addWidget(self.view.log_monitor_window, 5)
+        # bind
+        self.log_monitor = LoggerMonitorController(self.view.log_monitor_window)
+        self.n2n_edge = N2NEdgeController(self.view.n2n_edge_window)
 
         self.view.show()
 

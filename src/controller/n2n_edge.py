@@ -6,16 +6,25 @@ from src.model.n2n_edge import N2NEdge
 from src.common.logger import Logger
 from src.common.const import *
 from src.common.exception import *
+
 from src.view.n2n_edge import N2NEdgeView
+from src.view.advanced_setting import AdvancedSettingView
 from src.controller.advance_setting import AdvancedSettingController
 
+
 class N2NEdgeController:
-    def __init__(self):
-        self.view = N2NEdgeView()
-        self.advance_setting = None
+    def __init__(self, view: N2NEdgeView):
+        # view
+        self.view = view        
+        self.advance_setting_view = AdvancedSettingView()
+
         self.config_model = Config()
         self.n2n_edge_model = N2NEdge()
+
+        # bind
         self.view.run_button.clicked.connect(self.run_n2n_edge_event)
+
+        self.advance_setting_controller = AdvancedSettingController(self.advance_setting_view)
 
     def run_n2n_edge_event(self):
         try:
@@ -39,6 +48,3 @@ class N2NEdgeController:
         except Exception as e:
             Logger().error(e)
             QMessageBox.warning(self, "错误", "未知错误")
-
-    def show_advance_setting(self):
-        self.advance_setting = AdvancedSettingController()

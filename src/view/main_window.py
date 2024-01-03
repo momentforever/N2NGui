@@ -1,10 +1,8 @@
 import os
-import sys
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, \
     QWidget, QAction, QMenu, QSystemTrayIcon, QApplication, QSizePolicy, QHBoxLayout
-from qt_material import apply_stylesheet
 
 from src.common.const import *
 from src.view.log_monitor import LogMonitorView
@@ -14,9 +12,6 @@ from src.view.n2n_edge import N2NEdgeView
 class MainWindowView(QMainWindow):
     def __init__(self):
         super().__init__()
-
-        # 应用 Qt-Material 主题
-        apply_stylesheet(self, theme='light_cyan_500.xml')
 
         self.setWindowTitle("N2NGui")
         self.icon = QIcon(os.path.join(Path.WORKER_DIR, "statics\\icon_32.ico"))
@@ -85,6 +80,8 @@ class MainWindowView(QMainWindow):
 
         self.setCentralWidget(central_widget)
         self.center_layout = QHBoxLayout(central_widget)
-        self.n2n_edge_window = None
-        self.log_monitor_window = None
 
+        self.view.n2n_edge_view = N2NEdgeView()
+        self.view.center_layout.addWidget(self.view.n2n_edge_view, 2)
+        self.view.log_monitor_view = LogMonitorView()
+        self.view.center_layout.addWidget(self.view.log_monitor_view, 5)

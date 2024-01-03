@@ -4,16 +4,12 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIntValidator, QIcon
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QMessageBox, QVBoxLayout, \
     QWidget, QHBoxLayout, QGridLayout, QTextEdit, QSizePolicy
-from qt_material import apply_stylesheet
 
 from src.common.const import *
 
 class AdvancedSettingView(QWidget):
     def __init__(self):
         super().__init__()
-
-        # 应用 Qt-Material 主题
-        apply_stylesheet(self, theme='light_cyan_500.xml')
 
         self.setWindowTitle("高级设置")
         self.icon = QIcon(os.path.join(Path.WORKER_DIR, "statics\\icon_32.ico"))
