@@ -8,25 +8,25 @@ from src.common.const import *
 from src.common.exception import *
 
 from src.view.n2n_edge import N2NEdgeView
-from src.view.advanced_setting import AdvancedSettingView
 from src.controller.advance_setting import AdvancedSettingController
 
 
 class N2NEdgeController:
     def __init__(self, view: N2NEdgeView):
         # view
-        self.view = view        
-        self.advance_setting_view = AdvancedSettingView()
+        self.view = view
 
         self.config_model = Config()
         self.n2n_edge_model = N2NEdge()
 
         # bind
         self.view.run_button.clicked.connect(self.run_n2n_edge_event)
+        self.view.advanced_setting_button.clicked.connect(self.show_advance_setting_event)
 
-        self.advance_setting_controller = AdvancedSettingController(self.advance_setting_view)
+        self.advance_setting_controller = AdvancedSettingController(self.view.advance_setting_view)
 
     def run_n2n_edge_event(self):
+        Logger.debug("run n2n edge event")
         try:
             if self.n2n_edge_model.process_status in Status.ENABLE_START:
                 self.config_model.supernode = self.view.supernode_entry.text()
@@ -48,3 +48,7 @@ class N2NEdgeController:
         except Exception as e:
             Logger().error(e)
             QMessageBox.warning(self, "错误", "未知错误")
+
+    def show_advance_setting_event(self):
+        Logger().debug("show advance setting event")
+        self.advance_setting_controller.show_event()

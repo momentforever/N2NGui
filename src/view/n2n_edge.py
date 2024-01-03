@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QMessageBox, QVBoxLayout, \
     QWidget
+from src.view.advanced_setting import AdvancedSettingView
 
 class N2NEdgeView(QWidget):
     def __init__(self):
@@ -31,5 +32,7 @@ class N2NEdgeView(QWidget):
         self.run_button = QPushButton("运行")
         self.layout.addWidget(self.run_button)
 
-        self.advanced_settings_button = QPushButton("高级设置")
-        self.layout.addWidget(self.advanced_settings_button)
+        self.advanced_setting_button = QPushButton("高级设置")
+        self.layout.addWidget(self.advanced_setting_button)
+
+        self.advance_setting_view = AdvancedSettingView()

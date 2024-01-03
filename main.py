@@ -1,7 +1,7 @@
 from src.common.logger import Logger
 from src.model.config import Config
 from src.model.n2n_edge import N2NEdge
-from src.view.gui import GUI
+from src.gui import GUI
 
 
 

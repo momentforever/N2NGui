@@ -37,19 +37,12 @@ class MainWindowView(QMainWindow):
         self.options_menu = QMenu("选项", self)
         # 初始化 开启自启动
         self.startup_action = QAction("开机自启动", self)
-        # 设置 开启自启动
         self.startup_action.setCheckable(True)
-
-        # 初始化 开启自启动
-        self.auto_restart_action = QAction("自动异常重启", self)
-        # 设置 开启自启动
-        self.auto_restart_action.setCheckable(True)
+        self.options_menu.addAction(self.startup_action)
 
         # 初始化 安装网卡
         self.install_nic_action = QAction("安装网卡驱动", self)
-
-        # 初始化 退出
-        self.close_action = QAction("退出", self)
+        self.options_menu.addAction(self.install_nic_action)
 
         # 绑定设置
         self.menu_bar.addMenu(self.options_menu)
@@ -57,7 +50,6 @@ class MainWindowView(QMainWindow):
     def _init_system_bar(self):
         # 创建系统托盘菜单
         self.tray_icon = QSystemTrayIcon(self)
-
         self.tray_icon.setIcon(self.normal_icon)
 
         # 创建菜单项

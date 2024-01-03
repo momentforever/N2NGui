@@ -42,5 +42,8 @@ class AdvancedSettingController:
         self.config.edge_etc_args = self.view.edge_etc_args_entry.toPlainText()
         self.view.close()
 
+    def show_event(self):
+        self.view.show()
+
     def close_event(self):
         self.view.close()
