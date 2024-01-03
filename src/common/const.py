@@ -4,6 +4,7 @@
 import os
 import sys
 
+
 class Status:
     """
     运行状态
@@ -34,6 +35,7 @@ class Status:
         返回字符串
         """
         return Status._strs[status]
+
 
 class Path:
     """

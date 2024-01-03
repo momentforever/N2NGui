@@ -3,15 +3,16 @@
 """
 
 import logging
-import os
 
-from src.common.singleton import Singleton
 from src.common.const import Path
+from src.common.singleton import Singleton
+
 
 class Logger(metaclass=Singleton):
     """
     日志模块
     """
+
     def __init__(self):
         self.logger = logging.getLogger("N2NGui")
         self.logger.setLevel(level=logging.DEBUG)

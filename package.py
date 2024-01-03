@@ -44,7 +44,6 @@ os.mkdir(package_dir)
 
 # 拷贝文件
 shutil.copytree("statics", os.path.join(package_dir, "statics"))
-shutil.copytree("n2n", os.path.join(package_dir, "n2n"))
 shutil.copytree("tools", os.path.join(package_dir, "tools"))
 shutil.copy(os.path.join(".\\dist", f"{project_name}.exe"), package_dir)
 

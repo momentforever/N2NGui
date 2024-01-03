@@ -1,11 +1,10 @@
-import logging
-import threading
 import time
+
 from PyQt5.QtCore import QThread, pyqtSignal
-from PyQt5.QtWidgets import QTextEdit, QWidget, QVBoxLayout, QSizePolicy
 
 from src.common.const import *
 from src.view.log_monitor import LogMonitorView
+
 
 class LogMonitorThread(QThread):
     update_signal = pyqtSignal(str)
@@ -19,12 +18,13 @@ class LogMonitorThread(QThread):
                     continue
                 self.update_signal.emit(line.strip())
 
+
 class LoggerMonitorController:
     def __init__(self, view: LogMonitorView):
-        #view
+        # view
         self.view = view
 
-        #bind
+        # bind
         self.log_monitor_thread = LogMonitorThread()
         self.log_monitor_thread.update_signal.connect(self.append_log)
         self.log_monitor_thread.start()

@@ -1,8 +1,6 @@
-import os
-
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, \
-    QWidget, QAction, QMenu, QSystemTrayIcon, QApplication, QSizePolicy, QHBoxLayout
+from PyQt5.QtWidgets import QMainWindow, QWidget, QAction, QMenu, QSystemTrayIcon, QApplication, QSizePolicy, \
+    QHBoxLayout
 
 from src.common.const import *
 from src.view.log_monitor import LogMonitorView
@@ -73,7 +71,7 @@ class MainWindowView(QMainWindow):
         self.setCentralWidget(central_widget)
         self.center_layout = QHBoxLayout(central_widget)
 
-        self.view.n2n_edge_view = N2NEdgeView()
-        self.view.center_layout.addWidget(self.view.n2n_edge_view, 2)
-        self.view.log_monitor_view = LogMonitorView()
-        self.view.center_layout.addWidget(self.view.log_monitor_view, 5)
+        self.n2n_edge_view = N2NEdgeView()
+        self.center_layout.addWidget(self.n2n_edge_view, 2)
+        self.log_monitor_view = LogMonitorView()
+        self.center_layout.addWidget(self.log_monitor_view, 5)

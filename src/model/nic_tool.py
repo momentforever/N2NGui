@@ -1,10 +1,10 @@
 import subprocess
 import zipfile
-import os
 
-from src.common.exception import *
 from src.common.const import *
+from src.common.exception import *
 from src.common.singleton import Singleton
+
 
 class NicTool(metaclass=Singleton):
     """

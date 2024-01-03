@@ -1,11 +1,10 @@
-import os
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIntValidator, QIcon
-from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QMessageBox, QVBoxLayout, \
-    QWidget, QHBoxLayout, QGridLayout, QTextEdit, QSizePolicy
+from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, \
+    QWidget, QGridLayout, QTextEdit, QSizePolicy
 
 from src.common.const import *
+
 
 class AdvancedSettingView(QWidget):
     def __init__(self):

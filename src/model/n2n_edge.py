@@ -8,15 +8,17 @@ from src.model.config import Config
 from src.common.logger import Logger
 from src.common.exception import *
 
+
 # 单例模式
 class N2NEdge(metaclass=Singleton):
     """
     N2N
     """
+
     def __init__(self):
         self.process_status: Status = Status.OFF
 
-        self._thread = threading.Thread(target=self._run_process)
+        self._thread: threading.Thread = None
 
         self._process: subprocess.Popen = None
         self._config: Config = Config()
@@ -34,43 +36,43 @@ class N2NEdge(metaclass=Singleton):
         if not self._config.supernode:
             raise N2NGuiException("缺少服务器节点")
         cmd.append("-l")
-        cmd.append(self._config.supernode)
+        cmd.append(str(self._config.supernode))
 
         if not self._config.edge_community:
             raise N2NGuiException("缺少服务器群组名")
         cmd.append("-c")
-        cmd.append(self._config.edge_community)
+        cmd.append(str(self._config.edge_community))
 
         if self._config.edge_community_password:
             cmd.append("-k")
-            cmd.append(self._config.edge_community_password)
+            cmd.append(str(self._config.edge_community_password))
 
         if self._config.edge_ip:
             cmd.append("-a")
-            cmd.append(self._config.edge_ip)
+            cmd.append(str(self._config.edge_ip))
 
         if self._config.edge_package_size:
             cmd.append("-M")
-            cmd.append(self._config.edge_package_size)
+            cmd.append(str(self._config.edge_package_size))
 
         if self._config.edge_description:
             cmd.append("-I")
-            cmd.append(self._config.edge_description)
+            cmd.append(str(self._config.edge_description))
 
         if self._config.edge_etc_args:
-            edge_etc_args = self._config.edge_etc_args.split("\n")
-            for edge_etc_arg in edge_etc_args:
-                edge_etc_arg = edge_etc_arg.split("#")[0]
-                if not edge_etc_arg:
+            for edge_etc_arg in self._config.edge_etc_args:
+                if edge_etc_arg.startswith("#"):
                     continue
-                cmd += edge_etc_arg.split(" ")
+                cmd += edge_etc_arg
 
         Logger().debug(f'Start n2n edge command is {" ".join(cmd)}')
 
         return cmd
 
     @staticmethod
-    def _log(msg,*args,**kwargs):
+    def _log(msg, *args, **kwargs):
+        if len(msg) == 0:
+            return
         Logger().info(f"[N2N] {msg}", *args, **kwargs)
 
     def _run_process(self):
@@ -124,15 +126,16 @@ class N2NEdge(metaclass=Singleton):
         """
         非阻塞启动
         """
-        if self._thread.is_alive():
+        if self._thread is not None and self._thread.is_alive():
             return
+        self._thread = threading.Thread(target=self._run_process)
         self._thread.start()
 
     def restart_thread(self):
         """
-        非阻塞重启
+        阻塞重启
         """
-        if self._thread.is_alive():
+        if self._thread is not None and self._thread.is_alive():
             self.stop_thread()
         self.start_thread()
 
@@ -140,5 +143,7 @@ class N2NEdge(metaclass=Singleton):
         """
         阻塞停止
         """
+        if not self._thread:
+            return
         self._terminate_process()
         self._thread.join()

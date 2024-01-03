@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QTextEdit, QWidget, QVBoxLayout, QSizePolicy
 
+
 class LogMonitorView(QWidget):
     def __init__(self):
         super().__init__()

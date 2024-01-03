@@ -1,13 +1,17 @@
-from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QMessageBox, QVBoxLayout, \
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, \
     QWidget
 from src.view.advanced_setting import AdvancedSettingView
 
+
 class N2NEdgeView(QWidget):
+    status_signal = pyqtSignal(int)
+
     def __init__(self):
         super().__init__()
 
         self.layout = QVBoxLayout(self)
-        
+
         self.supernode_label = QLabel("超级节点地址和端口*：")
         self.supernode_entry = QLineEdit()
         self.layout.addWidget(self.supernode_label)

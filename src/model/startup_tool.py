@@ -1,12 +1,11 @@
-import logging
-import winreg
 import ctypes
+import winreg
 
-from src.model.config import Config
-from src.common.singleton import Singleton
-from src.common.logger import Logger
 from src.common.const import *
 from src.common.exception import *
+from src.common.logger import Logger
+from src.common.singleton import Singleton
+
 
 class StartupTool(metaclass=Singleton):
     REG_NAME = "N2NGui"
@@ -18,7 +17,6 @@ class StartupTool(metaclass=Singleton):
         except Exception as e:
             Logger().error(e)
             return False
-
 
     def is_exist(self):
         try:
@@ -47,7 +45,6 @@ class StartupTool(metaclass=Singleton):
         except FileNotFoundError:
             return False
 
-
     def add_to(self):
         if not self.is_admin():
             raise N2NGuiException("请以管理员身份运行")
@@ -67,7 +64,6 @@ class StartupTool(metaclass=Singleton):
         except Exception as e:
             Logger().error(e)
             raise N2NGuiException("注册失败") from e
-
 
     def delete_from(self):
         try:
