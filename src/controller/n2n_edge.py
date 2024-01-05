@@ -4,8 +4,7 @@ from src.common.const import *
 from src.common.exception import *
 from src.common.logger import Logger
 from src.controller.advance_setting import AdvancedSettingController
-from src.model.config import Config
-from src.model.n2n_edge import N2NEdge
+from src.tools.config import Config
 from src.view.n2n_edge import N2NEdgeView
 
 

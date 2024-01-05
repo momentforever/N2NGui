@@ -1,6 +1,6 @@
 from src.common.logger import Logger
-from src.model.config import Config
-from src.model.n2n_edge import N2NEdge
+from src.tools.config import Config
+from src.tools.n2n_edge_tool import N2NEdge
 from src.gui import GUI
 
 

@@ -7,9 +7,6 @@ from src.common.singleton import Singleton
 
 
 class NicTool(metaclass=Singleton):
-    """
-    驱动模块
-    """
     def _unzip_nic(self):
         if os.path.exists(Path.NIC_PATH):
             return
@@ -21,9 +18,6 @@ class NicTool(metaclass=Singleton):
             zip_ref.extractall(Path.NIC_UNZIP_DIR)
 
     def install(self):
-        """
-        非阻塞驱动安装
-        """
         self._unzip_nic()
         try:
             process = subprocess.Popen([Path.NIC_PATH],

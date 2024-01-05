@@ -5,9 +5,9 @@ from src.common.exception import *
 from src.common.logger import Logger
 from src.controller.log_monitor import LoggerMonitorController
 from src.controller.n2n_edge import N2NEdgeController
-from src.model.config import Config
-from src.model.nic_tool import NicTool
-from src.model.startup_tool import StartupTool
+from src.tools.config import Config
+from src.tools.nic_tool import NicTool
+from src.tools.startup_tool import StartupTool
 from src.view.main_window import MainWindowView
 
 
@@ -21,18 +21,18 @@ class MainWindowController:
         self.view = view
 
         # bind
-        self.log_monitor = LoggerMonitorController(self.view.log_monitor_view)
-        self.n2n_edge = N2NEdgeController(self.view.n2n_edge_view)
-        self.view.n2n_edge_view.status_signal.connect(self.update_tray_icon)
+        self.log_monitor = LoggerMonitorController(self.view.home_interface.log_monitor_view)
+        self.n2n_edge = N2NEdgeController(self.view.home_interface.n2n_edge_view)
+        self.view.home_interface.n2n_edge_view.status_signal.connect(self.update_tray_icon)
 
-        self.view.startup_action.setChecked(self.config.is_auto_startup)
-        self.view.startup_action.triggered.connect(self.set_startup_event)
-
-        self.view.install_nic_action.triggered.connect(self.install_nic_event)
-
-        self.view.show_action.triggered.connect(self.show_event)
-        self.view.quit_action.triggered.connect(self.quit_event)
-        self.view.tray_icon.activated.connect(self.tray_icon_activated_event)
+        # self.view.startup_action.setChecked(self.config.is_auto_startup)
+        # self.view.startup_action.triggered.connect(self.set_startup_event)
+        #
+        # self.view.install_nic_action.triggered.connect(self.install_nic_event)
+        #
+        # self.view.show_action.triggered.connect(self.show_event)
+        # self.view.quit_action.triggered.connect(self.quit_event)
+        # self.view.tray_icon.activated.connect(self.tray_icon_activated_event)
 
         self.view.closeEvent = self.closeEvent
 

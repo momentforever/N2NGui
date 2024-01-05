@@ -15,18 +15,19 @@ class Logger(metaclass=Singleton):
 
     def __init__(self):
         self.logger = logging.getLogger("N2NGui")
+
         self.logger.setLevel(level=logging.DEBUG)
         format_str = "[%(asctime)s] [%(levelname)s] - %(message)s"
-        format_datafmt = '%Y-%m-%d %H:%M:%S'
+        format_datefmt = '%Y-%m-%d %H:%M:%S'
 
         handler = logging.FileHandler(Path.LOG_PATH, mode='w', encoding='utf-8')
         handler.setLevel(logging.INFO)
-        handler.setFormatter(logging.Formatter(format_str, datefmt=format_datafmt))
+        handler.setFormatter(logging.Formatter(format_str, datefmt=format_datefmt))
         self.logger.addHandler(handler)
 
         console = logging.StreamHandler()
         console.setLevel(logging.DEBUG)
-        handler.setFormatter(logging.Formatter(format_str, datefmt=format_datafmt))
+        console.setFormatter(logging.Formatter(format_str, datefmt=format_datefmt))
         self.logger.addHandler(console)
 
     def get_logger(self):

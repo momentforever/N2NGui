@@ -1,33 +1,19 @@
 import subprocess
-import threading
 import time
 
 from src.common.singleton import Singleton
 from src.common.const import *
-from src.model.config import Config
+from src.tools.config import Config
 from src.common.logger import Logger
 from src.common.exception import *
 
 
 # 单例模式
-class N2NEdge(metaclass=Singleton):
-    """
-    N2N
-    """
-
+class N2NEdgeTool(metaclass=Singleton):
     def __init__(self):
         self.process_status: Status = Status.OFF
-
-        self._thread: threading.Thread = None
-
         self._process: subprocess.Popen = None
         self._config: Config = Config()
-
-        if self._config.is_auto_startup:
-            try:
-                self.start_thread()
-            except Exception as e:
-                Logger().error(e)
 
     def _generate_cmd(self):
         cmd = []
@@ -75,7 +61,7 @@ class N2NEdge(metaclass=Singleton):
             return
         Logger().info(f"[N2N] {msg}", *args, **kwargs)
 
-    def _run_process(self):
+    def run_process(self):
         if self.process_status not in Status.ENABLE_START:
             Logger().warning(f"couldn't start n2n edg2, \
                              current status is {Status.to_str(self.process_status)}")
@@ -106,7 +92,7 @@ class N2NEdge(metaclass=Singleton):
         Logger().info("Terminate n2n edge process!")
         self.process_status = Status.STOPPED
 
-    def _terminate_process(self):
+    def terminate_process(self):
         # 未启动
         if not self._process:
             return
@@ -121,29 +107,3 @@ class N2NEdge(metaclass=Singleton):
         except Exception as e:
             Logger().error(e)
             raise N2NGuiException("停止进程失败") from e
-
-    def start_thread(self):
-        """
-        非阻塞启动
-        """
-        if self._thread is not None and self._thread.is_alive():
-            return
-        self._thread = threading.Thread(target=self._run_process)
-        self._thread.start()
-
-    def restart_thread(self):
-        """
-        阻塞重启
-        """
-        if self._thread is not None and self._thread.is_alive():
-            self.stop_thread()
-        self.start_thread()
-
-    def stop_thread(self):
-        """
-        阻塞停止
-        """
-        if not self._thread:
-            return
-        self._terminate_process()
-        self._thread.join()

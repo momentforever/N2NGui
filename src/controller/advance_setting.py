@@ -1,4 +1,4 @@
-from src.model.config import Config
+from src.tools.config import Config
 
 from src.view.advanced_setting import AdvancedSettingView
 

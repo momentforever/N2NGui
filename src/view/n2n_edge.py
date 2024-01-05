@@ -1,12 +1,16 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, \
-    QWidget
+    QWidget, QMessageBox
+
+from src.common.const import Status
+from src.common.exception import N2NGuiException
+from src.common.logger import Logger
+from src.model.n2n_edge_thread import N2NEdgeThread
+from src.tools.config import Config
 from src.view.advanced_setting import AdvancedSettingView
 
 
 class N2NEdgeView(QWidget):
-    status_signal = pyqtSignal(int)
-
     def __init__(self):
         super().__init__()
 
@@ -36,7 +40,45 @@ class N2NEdgeView(QWidget):
         self.run_button = QPushButton("运行")
         self.layout.addWidget(self.run_button)
 
-        self.advanced_setting_button = QPushButton("高级设置")
-        self.layout.addWidget(self.advanced_setting_button)
+        self.config_model = Config()
+        self.n2n_edge_model = N2NEdgeThread()
+        self.n2n_edge_model.status_signal.connect(self.update_status)
 
-        self.advance_setting_view = AdvancedSettingView()
+        # bind
+        self.run_button.clicked.connect(self.run_n2n_edge_event)
+
+        self.edge_ip_entry.setText(self.config_model.edge_ip)
+        self.supernode_entry.setText(self.config_model.supernode)
+        self.edge_community_password_entry.setText(self.config_model.edge_community_password)
+        self.edge_community_entry.setText(self.config_model.edge_community)
+
+
+    def update_status(self, status):
+        if status == Status.ON:
+            # TODO 设置遮罩
+            self.run_button.setText("终止")
+        elif status == Status.OFF:
+            self.run_button.setText("运行")
+
+    def run_n2n_edge_event(self):
+        Logger().debug("run n2n edge event")
+        try:
+            if self.n2n_edge_model.get_status() in Status.ENABLE_START:
+                self.config_model.supernode = self.supernode_entry.text()
+                self.config_model.edge_ip = self.edge_ip_entry.text()
+                self.config_model.edge_community = self.edge_community_entry.text()
+                self.config_model.edge_community_password = self.edge_community_password_entry.text()
+                # 运行程序
+                self.n2n_edge_model.start()
+            elif self.n2n_edge_model.get_status() in Status.ENABLE_STOP:
+                self.n2n_edge_model.stop()
+            else:
+                Logger().warning(f"couldn't operate N2N edge, "
+                                 f"current status: {Status.to_str(self.n2n_edge_model.get_status())}")
+
+        except N2NGuiException as e:
+            QMessageBox.warning(self, "错误", e.args[0])
+        except Exception as e:
+            Logger().error(e)
+            QMessageBox.warning(self, "错误", "未知错误")
+

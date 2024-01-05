@@ -2,15 +2,53 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QWidget, QAction, QMenu, QSystemTrayIcon, QApplication, QSizePolicy, \
     QHBoxLayout
 
+from qfluentwidgets import *
+from qfluentwidgets import FluentIcon as FIF
+
 from src.common.const import *
 from src.view.log_monitor import LogMonitorView
 from src.view.n2n_edge import N2NEdgeView
 
+class MainWidget(QWidget):
+    def __init__(self, name: str, parent=None):
+        super().__init__(parent=parent)
+        self.setObjectName(name)
+        self.center_layout = QHBoxLayout(self)
 
-class MainWindowView(QMainWindow):
+        self.n2n_edge_view = N2NEdgeView()
+        self.center_layout.addWidget(self.n2n_edge_view, 2)
+        self.log_monitor_view = LogMonitorView()
+        self.center_layout.addWidget(self.log_monitor_view, 5)
+
+class MainWindowView(MSFluentWindow):
     def __init__(self):
         super().__init__()
+        self._init_window()
+        self._init_center()
+        self._init_system_bar()
 
+    def _init_center(self):
+        self.home_interface = MainWidget(name="Home", parent=self)
+        self.addSubInterface(self.home_interface, FIF.HOME, '主页', FIF.HOME_FILL)
+
+    # def _init_top_bar(self):
+    #     # 初始化 主菜单
+    #     self.menu_bar = self.menuBar()
+    #     # 初始化 选项
+    #     self.options_menu = QMenu("选项", self)
+    #     # 初始化 开启自启动
+    #     self.startup_action = QAction("开机自启动", self)
+    #     self.startup_action.setCheckable(True)
+    #     self.options_menu.addAction(self.startup_action)
+    #
+    #     # 初始化 安装网卡
+    #     self.install_nic_action = QAction("安装网卡驱动", self)
+    #     self.options_menu.addAction(self.install_nic_action)
+    #
+    #     # 绑定设置
+    #     self.menu_bar.addMenu(self.options_menu)
+
+    def _init_window(self):
         self.setWindowTitle("N2NGui")
         self.icon = QIcon(os.path.join(Path.WORKER_DIR, "statics\\icon_32.ico"))
         self.normal_icon = QIcon(os.path.join(Path.WORKER_DIR, "statics\\icon_normal_48.ico"))
@@ -19,31 +57,10 @@ class MainWindowView(QMainWindow):
         self.setWindowIcon(self.icon)
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
 
-        self._init_top_bar()
-        self._init_system_bar()
-        self._init_center()
-
         # 设置窗口默认大小
         screen_resolution = QApplication.desktop().screenGeometry()
         width, height = screen_resolution.width() * 0.4, screen_resolution.height() * 0.3
         self.resize(int(width), int(height))
-
-    def _init_top_bar(self):
-        # 初始化 主菜单
-        self.menu_bar = self.menuBar()
-        # 初始化 选项
-        self.options_menu = QMenu("选项", self)
-        # 初始化 开启自启动
-        self.startup_action = QAction("开机自启动", self)
-        self.startup_action.setCheckable(True)
-        self.options_menu.addAction(self.startup_action)
-
-        # 初始化 安装网卡
-        self.install_nic_action = QAction("安装网卡驱动", self)
-        self.options_menu.addAction(self.install_nic_action)
-
-        # 绑定设置
-        self.menu_bar.addMenu(self.options_menu)
 
     def _init_system_bar(self):
         # 创建系统托盘菜单
@@ -64,14 +81,3 @@ class MainWindowView(QMainWindow):
 
         # 显示系统托盘图标
         self.tray_icon.show()
-
-    def _init_center(self):
-        central_widget = QWidget(self)
-
-        self.setCentralWidget(central_widget)
-        self.center_layout = QHBoxLayout(central_widget)
-
-        self.n2n_edge_view = N2NEdgeView()
-        self.center_layout.addWidget(self.n2n_edge_view, 2)
-        self.log_monitor_view = LogMonitorView()
-        self.center_layout.addWidget(self.log_monitor_view, 5)
