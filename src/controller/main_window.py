@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QMessageBox, QApplication, QSystemTrayIcon
 from src.common.const import Status
 from src.common.exception import *
 from src.common.logger import Logger
-from src.controller.log_monitor import LoggerMonitorController
 from src.controller.n2n_edge import N2NEdgeController
 from src.tools.config import Config
 from src.tools.nic_tool import NicTool
