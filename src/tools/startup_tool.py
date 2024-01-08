@@ -66,6 +66,9 @@
 #             raise N2NGuiException("注册失败") from e
 #
 #     def delete_from(self):
+#         if not self.is_exist():
+#             return
+#
 #         try:
 #             # 打开注册表项
 #             key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,

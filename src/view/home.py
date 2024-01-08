@@ -76,8 +76,13 @@ class N2NEdgeWidget(QWidget):
         self.edge_community_entry.setText(self.config.edge_community)
         self.edge_ip_entry.setText(self.config.edge_ip)
 
-        if self.config.is_auto_startup:
-            self.run_n2n_edge_event()
+        try:
+            if self.config.is_auto_startup:
+                self.run_n2n_edge_event()
+        except Exception as e:
+            Logger().error("Auto Startup Failed! Detail Info:")
+            Logger().error(e)
+
 
     def update_status(self, status):
         if status == Status.ON:
@@ -94,7 +99,7 @@ class N2NEdgeWidget(QWidget):
             self.run_button.setText("运行")
 
     def run_n2n_edge_event(self):
-        Logger().debug("run n2n edge event")
+        Logger().debug("Run N2N Edge Event")
         try:
             if self.n2n_edge.get_status() in Status.ENABLE_START:
                 self.config.supernode = self.supernode_entry.text()
@@ -106,8 +111,8 @@ class N2NEdgeWidget(QWidget):
             elif self.n2n_edge.get_status() in Status.ENABLE_STOP:
                 self.n2n_edge.stop()
             else:
-                Logger().warning(f"couldn't operate N2N edge, "
-                                 f"current status: {Status.to_str(self.n2n_edge.get_status())}")
+                Logger().warning(f"Couldn't operate N2N edge, Current status: "
+                                 f"{Status.to_str(self.n2n_edge.get_status())}")
 
         except N2NGuiException as e:
             MessageBox("错误", e.args[0], parent=self.parent())

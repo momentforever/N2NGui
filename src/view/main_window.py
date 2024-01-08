@@ -56,16 +56,18 @@ class MainWindow(MSFluentWindow):
         self.tray_icon.setIcon(self.normal_icon)
 
         self.menu = RoundMenu(parent=self)
-        # menu = CheckableMenu(parent=self, indicatorType=MenuIndicatorType.RADIO)
 
         # add actions
         self.show_action = Action(FIF.HOME, '显示')
+        self.hide_action = Action(FIF.HIDE, '隐藏')
         self.close_action = Action(FIF.CLOSE, '退出')
 
         self.menu.addAction(self.show_action)
+        self.menu.addAction(self.hide_action)
         self.menu.addAction(self.close_action)
 
         self.show_action.triggered.connect(self.show_event)
+        self.hide_action.triggered.connect(self.hide_event)
         self.close_action.triggered.connect(self.close_event)
 
         # 设置系统托盘菜单
@@ -81,6 +83,9 @@ class MainWindow(MSFluentWindow):
         else:
             self.setWindowFlags(self.windowFlags() & ~Qt.WindowStaysOnTopHint)
             self.show()
+
+    def hide_event(self):
+        self.hide()
 
     def close_event(self):
         self.close()
