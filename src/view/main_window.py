@@ -11,6 +11,7 @@ from src.common.const import *
 from src.tools.config import Config
 from src.view.advanced_setting import AdvancedSettingWidget
 from src.view.home import HomeWidget
+from src.view.net_test import NetTestWidget
 from src.view.sundry import SundryWidget
 
 
@@ -27,8 +28,10 @@ class MainWindow(MSFluentWindow):
         self.home_interface = HomeWidget(parent=self)
         self.advanced_setting_interface = AdvancedSettingWidget(parent=self)
         self.sundry_interface = SundryWidget(parent=self)
+        self.net_test_interface = NetTestWidget(parent=self)
         self.addSubInterface(self.home_interface, FIF.HOME, '主页', FIF.HOME_FILL)
         self.addSubInterface(self.advanced_setting_interface, FIF.DEVELOPER_TOOLS, '高级')
+        self.addSubInterface(self.net_test_interface, FIF.EDIT, '测试')
         self.addSubInterface(self.sundry_interface, FIF.SETTING, '设置')
 
     def _init_window(self):

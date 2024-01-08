@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIntValidator, QIcon, QFont
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, \
     QWidget, QGridLayout, QTextEdit, QSizePolicy
-from qfluentwidgets import LineEdit, TextEdit, PushButton
+from qfluentwidgets import LineEdit, TextEdit, PushButton, StrongBodyLabel, BodyLabel
 
 from src.common.const import *
 from src.tools.config import Config
@@ -24,18 +24,18 @@ class AdvancedSettingWidget(QWidget):
         self.layout = QVBoxLayout(self)
         setting_layout = QGridLayout()
 
-        package_size_label = QLabel("包大小(MTU)")
+        package_size_label = BodyLabel("包大小(MTU)")
         self.package_size_entry = LineEdit()
         self.package_size_entry.setValidator(QIntValidator())
         setting_layout.addWidget(package_size_label, 0, 0)
         setting_layout.addWidget(self.package_size_entry, 0, 1)
 
-        edge_description_label = QLabel("设备描述：")
+        edge_description_label = BodyLabel("设备描述：")
         self.edge_description_entry = LineEdit()
         setting_layout.addWidget(edge_description_label, 1, 0)
         setting_layout.addWidget(self.edge_description_entry, 1, 1)
 
-        edge_etc_args_label = QLabel("其他参数(支持#注释)：")
+        edge_etc_args_label = BodyLabel("其他参数(支持#注释)：")
         self.edge_etc_args_entry = TextEdit()
         setting_layout.addWidget(edge_etc_args_label, 2, 0)
         setting_layout.addWidget(self.edge_etc_args_entry, 2, 1)

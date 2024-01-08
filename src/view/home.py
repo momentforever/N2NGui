@@ -2,7 +2,7 @@ from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, \
     QWidget, QMessageBox, QCompleter, QHBoxLayout, QSizePolicy
-from qfluentwidgets import LineEdit, PushButton, MessageBox, TextEdit
+from qfluentwidgets import LineEdit, PushButton, MessageBox, TextEdit, StrongBodyLabel, BodyLabel
 
 from src.common.const import Status
 from src.common.exception import N2NGuiException
@@ -35,27 +35,26 @@ class N2NEdgeWidget(QWidget):
 
         self.layout = QVBoxLayout(self)
 
-        self.supernode_label = QLabel("超级节点地址和端口：")
-        self.supernode_label.setFont(self.font)
+        self.supernode_label = StrongBodyLabel("超级节点地址和端口：")
         self.supernode_entry = LineEdit()
         self.supernode_entry.setPlaceholderText("必填")
         self.layout.addWidget(self.supernode_label)
         self.layout.addWidget(self.supernode_entry)
 
-        self.edge_community_label = QLabel("小组名称：")
+        self.edge_community_label = StrongBodyLabel("小组名称：")
         self.edge_community_entry = LineEdit()
         self.edge_community_entry.setPlaceholderText("必填")
         self.layout.addWidget(self.edge_community_label)
         self.layout.addWidget(self.edge_community_entry)
 
-        self.edge_community_password_label = QLabel("小组密码：")
+        self.edge_community_password_label = BodyLabel("小组密码：")
         self.edge_community_password_entry = LineEdit()
         self.edge_community_password_entry.setPlaceholderText("必填")
         self.edge_community_password_entry.setEchoMode(QLineEdit.Password)
         self.layout.addWidget(self.edge_community_password_label)
         self.layout.addWidget(self.edge_community_password_entry)
 
-        self.edge_ip_label = QLabel("Edge IP 地址：")
+        self.edge_ip_label = BodyLabel("Edge IP 地址：")
         self.edge_ip_entry = LineEdit()
         self.layout.addWidget(self.edge_ip_label)
         self.layout.addWidget(self.edge_ip_entry)
