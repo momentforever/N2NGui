@@ -9,6 +9,7 @@ from qfluentwidgets import FluentIcon as FIF
 
 from src.common.const import *
 from src.tools.config import Config
+from src.tools.n2n_edge_tool import N2NEdgeTool
 from src.view.advanced_setting import AdvancedSettingWidget
 from src.view.home import HomeWidget
 from src.view.net_test import NetTestWidget
@@ -53,6 +54,8 @@ class MainWindow(MSFluentWindow):
         width, height = screen_resolution.width() * 0.4, screen_resolution.height() * 0.3
         self.resize(int(width), int(height))
 
+        self.home_interface.n2n_edge_view.n2n_edge_status_signal.connect(self.update_n2n_edge_status)
+
     def _init_system_bar(self):
         # 创建系统托盘菜单
         self.tray_icon = QSystemTrayIcon(self)
@@ -79,13 +82,14 @@ class MainWindow(MSFluentWindow):
         # 显示系统托盘图标
         self.tray_icon.show()
 
+    def update_n2n_edge_status(self, status):
+        if status == Status.ON:
+            self.tray_icon.setIcon(self.running_icon)
+        elif status == Status.OFF:
+            self.tray_icon.setIcon(self.normal_icon)
+
     def show_event(self):
-        if not (self.windowFlags() | Qt.WindowStaysOnTopHint) == self.windowFlags():
-            self.setWindowFlags(Qt.WindowStaysOnTopHint | self.windowFlags())
-            self.show()
-        else:
-            self.setWindowFlags(self.windowFlags() & ~Qt.WindowStaysOnTopHint)
-            self.show()
+        self.showNormal()
 
     def hide_event(self):
         self.hide()
@@ -94,4 +98,5 @@ class MainWindow(MSFluentWindow):
         self.close()
 
     def closeEvent(self, event):
+        N2NEdgeTool().terminate_process_wait()
         Config().save()

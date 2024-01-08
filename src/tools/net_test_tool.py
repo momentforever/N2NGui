@@ -57,21 +57,21 @@ class NetTestTool(metaclass=Singleton):
         data = self._get_udp_package()
         if not data:
             raise N2NGuiException("无法访问监听端口")
+        Logger().info(f"Recv data: {data}")
         data = data.split("\n")
         is_find_edge = False
-
         edges = []
         for line in data:
-            if is_find_edge:
+            if line.find("PEER TO PEER"):
+                is_find_edge = True
+            elif is_find_edge is True and line.find("---"):
+                is_find_edge = False
+            elif is_find_edge is True:
                 tags = line.split("|")
                 nc = NetConfig()
                 nc.edge_ip = tags[1].strip()
                 nc.mac = tags[2].strip()
                 nc.ip_port = tags[3].strip()
                 edges.append(nc)
-            if line.find("PEER TO PEER"):
-                is_find_edge = True
-            if is_find_edge is True and line.find("---"):
-                is_find_edge = False
 
         return edges

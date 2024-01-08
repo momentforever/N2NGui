@@ -54,4 +54,4 @@ class Path:
     LOG_PATH = os.path.join(WORKER_DIR, "N2NGui.log")
     NIC_ZIP_PATH = os.path.join(WORKER_DIR, "tools\\tap-windows.zip")
     NIC_UNZIP_DIR = os.path.join(WORKER_DIR, "tools")
-    NIC_PATH = os.path.join(WORKER_DIR, "tools\\tap-windows\\tap-windows\\9.21.2.exe")
+    NIC_PATH = os.path.join(WORKER_DIR, "tools\\tap-windows\\9.21.2.exe")

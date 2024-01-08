@@ -25,6 +25,8 @@ class HomeWidget(QWidget):
 
 
 class N2NEdgeWidget(QWidget):
+    n2n_edge_status_signal = pyqtSignal(int)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -82,8 +84,8 @@ class N2NEdgeWidget(QWidget):
             Logger().error("Auto Startup Failed! Detail Info:")
             Logger().error(e)
 
-
     def update_status(self, status):
+        self.n2n_edge_status_signal.emit(status)
         if status == Status.ON:
             self.supernode_entry.setEnabled(False)
             self.edge_community_password_entry.setEnabled(False)

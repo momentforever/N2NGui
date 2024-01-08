@@ -74,16 +74,16 @@ class Config(metaclass=Singleton):
         with open(Path.CONFIG_PATH, 'r', encoding='utf-8') as yaml_file:
             config_dict: Dict = yaml.safe_load(yaml_file)
 
-        self.supernode = config_dict["supernode"]
-        self.edge_ip = config_dict["edge_ip"]
-        self.edge_community = config_dict["edge_community"]
-        self.edge_community_password = config_dict["edge_community_password"]
+        self.supernode = config_dict.get("supernode", self.supernode)
+        self.edge_ip = config_dict.get("edge_ip", self.edge_ip)
+        self.edge_community = config_dict.get("edge_community", self.edge_community)
+        self.edge_community_password = config_dict.get("edge_community_password", self.edge_community_password)
 
-        self.edge_package_size = config_dict.get("edge_package_size")
-        self.edge_description = config_dict.get("edge_description")
-        self.edge_etc_args = config_dict.get("edge_etc_args")
-        self.is_first_start = config_dict.get("is_first_start")
-        self.is_auto_startup = config_dict.get("is_auto_startup")
+        self.edge_package_size = config_dict.get("edge_package_size", self.edge_package_size)
+        self.edge_description = config_dict.get("edge_description", self.edge_description)
+        self.edge_etc_args = config_dict.get("edge_etc_args", self.edge_etc_args)
+        self.is_first_start = config_dict.get("is_first_start", self.is_first_start)
+        self.is_auto_startup = config_dict.get("is_auto_startup", self.is_auto_startup)
 
-        for n2n_edge_config_dic in config_dict.get("n2n_edge_configs"):
+        for n2n_edge_config_dic in config_dict.get("n2n_edge_configs", []):
             self.n2n_edge_configs.append(N2NEdgeConfig(**n2n_edge_config_dic))

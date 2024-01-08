@@ -37,7 +37,7 @@ class SundryWidget(QWidget):
         self.auto_startup_check_box.setChecked(self.config.is_auto_startup)
 
     def install_nic_event(self):
-        Logger().debug("install nic event")
+        Logger().debug("Install Nic Event")
         try:
             self.nic_tool.install()
         except N2NGuiException as e:
