@@ -19,9 +19,9 @@ class HomeWidget(QWidget):
 
         self.layout = QHBoxLayout(self)
         self.n2n_edge_view = N2NEdgeWidget(parent=self.parent())
-        self.layout.addWidget(self.n2n_edge_view, 2)
+        self.layout.addWidget(self.n2n_edge_view, 1)
         self.log_monitor_view = LogMonitorWidget(parent=self.parent())
-        self.layout.addWidget(self.log_monitor_view, 5)
+        self.layout.addWidget(self.log_monitor_view, 2)
 
 
 class N2NEdgeWidget(QWidget):
@@ -60,22 +60,22 @@ class N2NEdgeWidget(QWidget):
         self.layout.addWidget(self.edge_ip_label)
         self.layout.addWidget(self.edge_ip_entry)
 
-        self.run_button = PushButton("运行")
+        self.run_button = PushButton()
+        self.run_button.setText("运行")
         self.layout.addWidget(self.run_button)
 
         self.config = Config()
         self.n2n_edge = N2NEdgeThread()
 
-        self.n2n_edge.status_signal.connect(self.update_status)
-
         # bind
+        self.n2n_edge.status_signal.connect(self.update_status)
         self.run_button.clicked.connect(self.run_n2n_edge_event)
 
         self.supernode_entry.setText(self.config.supernode)
         self.edge_community_password_entry.setText(self.config.edge_community_password)
         self.edge_community_entry.setText(self.config.edge_community)
         self.edge_ip_entry.setText(self.config.edge_ip)
-        MessageBox("错误", "test", parent=self.parent())
+
         if self.config.is_auto_startup:
             self.run_n2n_edge_event()
 
@@ -110,10 +110,10 @@ class N2NEdgeWidget(QWidget):
                                  f"current status: {Status.to_str(self.n2n_edge.get_status())}")
 
         except N2NGuiException as e:
-            MessageBox.warning(self, "错误", e.args[0])
+            MessageBox("错误", e.args[0], parent=self.parent())
         except Exception as e:
             Logger().error(e)
-            MessageBox.warning(self, "错误", "未知错误")
+            MessageBox("错误", "未知错误，详情请见日志", parent=self.parent())
 
 
 class LogMonitorWidget(QWidget):

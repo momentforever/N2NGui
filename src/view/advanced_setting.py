@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIntValidator, QIcon
+from PyQt5.QtGui import QIntValidator, QIcon, QFont
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, \
     QWidget, QGridLayout, QTextEdit, QSizePolicy
-from qfluentwidgets import LineEdit, TextEdit
+from qfluentwidgets import LineEdit, TextEdit, PushButton
 
 from src.common.const import *
 from src.tools.config import Config
@@ -11,12 +11,17 @@ from src.tools.config import Config
 class AdvancedSettingWidget(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # model
+        self.config = Config()
+
         self.setObjectName("Advanced Setting")
 
-        self.is_changed = False
+        self.font = QFont()
+        self.font.setFamily("微软雅黑")
+        self.font.setPointSize(10)
+        self.setFont(self.font)
 
-        layout = QVBoxLayout(self)
-
+        self.layout = QVBoxLayout(self)
         setting_layout = QGridLayout()
 
         package_size_label = QLabel("包大小(MTU)")
@@ -30,37 +35,31 @@ class AdvancedSettingWidget(QWidget):
         setting_layout.addWidget(edge_description_label, 1, 0)
         setting_layout.addWidget(self.edge_description_entry, 1, 1)
 
-        edge_etc_args_label = QLabel("其他参数\n(支持#注释)：")
+        edge_etc_args_label = QLabel("其他参数(支持#注释)：")
         self.edge_etc_args_entry = TextEdit()
         setting_layout.addWidget(edge_etc_args_label, 2, 0)
         setting_layout.addWidget(self.edge_etc_args_entry, 2, 1)
 
         # 添加布局
-        layout.addLayout(setting_layout)
+        self.layout.addLayout(setting_layout)
 
         # 添加保存
-        self.save_button = QPushButton("保存")
-        layout.addWidget(self.save_button)
-
-        # bind
+        self.save_button = PushButton()
+        self.save_button.setText("保存")
         self.save_button.clicked.connect(self.save_settings)
+        self.layout.addWidget(self.save_button)
 
-        # model
-        self.config = Config()
-
-        # self.load_settings()
+        self.load_settings()
 
     def load_settings(self):
-        if self.config.edge_package_size:
-            self.view.package_size_entry.setText(str(self.config.edge_package_size))
-
-        if self.config.edge_description:
-            self.view.package_size_entry.setText(self.config.edge_description)
-
-        if self.config.edge_etc_args:
-            self.view.edge_etc_args_entry.setText("\n".join(self.config.edge_etc_args))
+        self.package_size_entry.setText(str(self.config.edge_package_size))
+        self.edge_description_entry.setText(self.config.edge_description)
+        self.edge_etc_args_entry.setText("\n".join(self.config.edge_etc_args))
 
     def save_settings(self):
-        self.config.edge_package_size = self.view.package_size_entry.text()
-        self.config.edge_description = self.view.edge_description_entry.text()
-        self.config.edge_etc_args = self.view.edge_etc_args_entry.toPlainText().split("\n")
+        self.config.edge_package_size = int(self.package_size_entry.text())
+        self.config.edge_description = self.edge_description_entry.text()
+        self.config.edge_etc_args = self.edge_etc_args_entry.toPlainText().split("\n")
+
+    def showEvent(self, a0):
+        self.load_settings()

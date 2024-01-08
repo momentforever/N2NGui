@@ -1,3 +1,5 @@
+from PyQt5 import QtCore
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtWidgets import QMainWindow, QWidget, QAction, QMenu, QSystemTrayIcon, QApplication, QSizePolicy, \
     QHBoxLayout
@@ -6,6 +8,7 @@ from qfluentwidgets import *
 from qfluentwidgets import FluentIcon as FIF
 
 from src.common.const import *
+from src.tools.config import Config
 from src.view.advanced_setting import AdvancedSettingWidget
 from src.view.home import HomeWidget
 from src.view.sundry import SundryWidget
@@ -56,11 +59,31 @@ class MainWindow(MSFluentWindow):
         # menu = CheckableMenu(parent=self, indicatorType=MenuIndicatorType.RADIO)
 
         # add actions
-        self.menu.addAction(Action(FIF.HOME, '显示'))
-        self.menu.addAction(Action(FIF.CLOSE, '退出'))
+        self.show_action = Action(FIF.HOME, '显示')
+        self.close_action = Action(FIF.CLOSE, '退出')
+
+        self.menu.addAction(self.show_action)
+        self.menu.addAction(self.close_action)
+
+        self.show_action.triggered.connect(self.show_event)
+        self.close_action.triggered.connect(self.close_event)
 
         # 设置系统托盘菜单
         self.tray_icon.setContextMenu(self.menu)
 
         # 显示系统托盘图标
         self.tray_icon.show()
+
+    def show_event(self):
+        if not (self.windowFlags() | Qt.WindowStaysOnTopHint) == self.windowFlags():
+            self.setWindowFlags(Qt.WindowStaysOnTopHint | self.windowFlags())
+            self.show()
+        else:
+            self.setWindowFlags(self.windowFlags() & ~Qt.WindowStaysOnTopHint)
+            self.show()
+
+    def close_event(self):
+        self.close()
+
+    def closeEvent(self, event):
+        Config().save()

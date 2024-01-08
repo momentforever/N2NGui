@@ -78,9 +78,19 @@
 #         except FileNotFoundError as e:
 #             Logger().error(e)
 
-from src.common.const import *
-from src.common.exception import *
-from src.common.logger import Logger
+
 from src.common.singleton import Singleton
+
+
 class StartupTool(metaclass=Singleton):
-    pass
+    def is_admin(self):
+        pass
+
+    def delete_from(self):
+        pass
+
+    def add_to(self):
+        pass
+
+    def is_exist(self):
+        pass
