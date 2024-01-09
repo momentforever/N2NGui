@@ -25,4 +25,4 @@ class LogMonitorThread(QThread):
 
     def stop_wait(self):
         self.stop_flag = True
-        self.wait(3)
+        self.wait(3000)
