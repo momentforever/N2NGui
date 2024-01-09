@@ -30,6 +30,8 @@ class Config(metaclass=Singleton):
         self.edge_community: str = ""
         self.edge_community_password: str = ""
 
+        self.enable_accept_multi_mac = False
+        self.enable_package_forwarding = False
         self.edge_package_size = 1386
         self.edge_description = ""
         self.edge_etc_args = []
@@ -55,6 +57,8 @@ class Config(metaclass=Singleton):
 
         yaml_cfg["edge_package_size"] = self.edge_package_size
         yaml_cfg["edge_description"] = self.edge_description
+        yaml_cfg["enable_package_forwarding"] = self.enable_package_forwarding
+        yaml_cfg["enable_accept_multi_mac"] = self.enable_accept_multi_mac
         yaml_cfg["edge_etc_args"] = self.edge_etc_args
         yaml_cfg["is_first_start"] = self.is_first_start
         yaml_cfg["is_auto_startup"] = self.is_auto_startup
@@ -79,6 +83,8 @@ class Config(metaclass=Singleton):
         self.edge_community = config_dict.get("edge_community", self.edge_community)
         self.edge_community_password = config_dict.get("edge_community_password", self.edge_community_password)
 
+        self.enable_package_forwarding = config_dict.get("enable_package_forwarding", self.enable_package_forwarding)
+        self.enable_accept_multi_mac = config_dict.get("enable_accept_multi_mac", self.enable_accept_multi_mac)
         self.edge_package_size = config_dict.get("edge_package_size", self.edge_package_size)
         self.edge_description = config_dict.get("edge_description", self.edge_description)
         self.edge_etc_args = config_dict.get("edge_etc_args", self.edge_etc_args)

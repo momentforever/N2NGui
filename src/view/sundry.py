@@ -1,10 +1,8 @@
 import traceback
 
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, \
-    QWidget, QMessageBox, QCompleter, QHBoxLayout, QSizePolicy
-from qfluentwidgets import LineEdit, PushButton, MessageBox, TextEdit, CheckBox
+from PyQt5.QtWidgets import QVBoxLayout, \
+    QWidget
+from qfluentwidgets import PushButton, MessageBox, CheckBox
 
 from src.common.exception import N2NGuiException
 from src.common.logger import Logger
@@ -24,12 +22,13 @@ class SundryWidget(QWidget):
 
         self.layout = QVBoxLayout(self)
 
-        self.install_nic_button = PushButton()
+        self.install_nic_button = PushButton(self)
         self.install_nic_button.setText("安装网卡驱动")
         self.install_nic_button.clicked.connect(self.install_nic_event)
         self.layout.addWidget(self.install_nic_button)
 
-        self.auto_startup_check_box = CheckBox('开机自启动', self)
+        self.auto_startup_check_box = CheckBox(self)
+        self.auto_startup_check_box.setText("开机自启动")
         self.auto_startup_check_box.clicked.connect(self.auto_startup_event)
         self.layout.addWidget(self.auto_startup_check_box)
 

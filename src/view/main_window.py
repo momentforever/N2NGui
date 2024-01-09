@@ -1,11 +1,5 @@
-import time
-
-from PyQt5 import QtCore
-from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtWidgets import QMainWindow, QWidget, QAction, QMenu, QSystemTrayIcon, QApplication, QSizePolicy, \
-    QHBoxLayout
-
+from PyQt5.QtWidgets import QSystemTrayIcon, QApplication, QSizePolicy
 from qfluentwidgets import *
 from qfluentwidgets import FluentIcon as FIF
 
@@ -100,7 +94,8 @@ class MainWindow(MSFluentWindow):
         self.tray_icon.hide()
         self.hide()
         Config().save()
-        N2NEdgeTool().terminate_process_wait()
+        self.home_interface.log_monitor_widget.log_monitor_thread.stop_wait()
+        self.home_interface.n2n_edge_widget.n2n_edge_thread.stop_wait()
         QApplication.quit()
 
     def closeEvent(self, event):

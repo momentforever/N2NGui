@@ -48,6 +48,13 @@ class N2NEdgeTool(metaclass=Singleton):
         if self._config.edge_description:
             cmd.append("-I")
             cmd.append(str(self._config.edge_description))
+
+        if self._config.enable_package_forwarding:
+            cmd.append("-r")
+
+        if self._config.enable_accept_multi_mac:
+            cmd.append("-E")
+
         if self._config.edge_etc_args:
             for edge_etc_arg in self._config.edge_etc_args:
                 edge_etc_arg = edge_etc_arg.split("#")[0]
@@ -107,27 +114,25 @@ class N2NEdgeTool(metaclass=Singleton):
         try:
             Logger().info("Stopping n2n edge process...")
             self.process_status = Status.STOPPING
-            self._send_stop_package() # 终止进程
+            self._send_stop_package()  # 终止进程
             # self._process.terminate()  # 终止进程
         except Exception as e:
             Logger().error(traceback.format_exc())
             raise N2NGuiException("停止进程失败") from e
 
-
-
-    def terminate_process_wait(self):
-        # 未启动
-        if not self._process:
-            return
-        # 已经终止
-        if self._process.poll() is not None:
-            return
-        self.terminate_process()
-        try:
-            self._process.wait(3)
-        except subprocess.TimeoutExpired:
-            Logger().warning("Abnormal stop n2n edge!")
-        Logger().info("Wait until stopping n2n edge process finish!")
+    # def terminate_process_wait(self):
+    #     # 未启动
+    #     if not self._process:
+    #         return
+    #     # 已经终止
+    #     if self._process.poll() is not None:
+    #         return
+    #     self.terminate_process()
+    #     try:
+    #         self._process.wait(3)
+    #     except subprocess.TimeoutExpired:
+    #         Logger().warning("Abnormal stop n2n edge!")
+    #     Logger().info("Wait until stopping n2n edge process finish!")
 
     def _send_stop_package(self):
         # 创建UDP套接字
