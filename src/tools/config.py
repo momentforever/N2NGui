@@ -37,7 +37,7 @@ class Config(metaclass=Singleton):
         self.edge_etc_args = []
         self.is_first_start = False
         self.is_auto_startup = False
-
+        self.is_run_broadcast = False
         # TODO
         # self.is_auto_restart = False
         # self.max_auto_restart_num = 3
@@ -62,6 +62,7 @@ class Config(metaclass=Singleton):
         yaml_cfg["edge_etc_args"] = self.edge_etc_args
         yaml_cfg["is_first_start"] = self.is_first_start
         yaml_cfg["is_auto_startup"] = self.is_auto_startup
+        yaml_cfg["is_run_broadcast"] = self.is_run_broadcast
 
         yaml_cfg["n2n_edge_configs"] = []
         for n2n_edge_config in self.n2n_edge_configs:
@@ -90,6 +91,7 @@ class Config(metaclass=Singleton):
         self.edge_etc_args = config_dict.get("edge_etc_args", self.edge_etc_args)
         self.is_first_start = config_dict.get("is_first_start", self.is_first_start)
         self.is_auto_startup = config_dict.get("is_auto_startup", self.is_auto_startup)
+        self.is_run_broadcast = config_dict.get("is_run_broadcast", self.is_run_broadcast)
 
         for n2n_edge_config_dic in config_dict.get("n2n_edge_configs", []):
             self.n2n_edge_configs.append(N2NEdgeConfig(**n2n_edge_config_dic))

@@ -1,17 +1,20 @@
 import traceback
 
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLineEdit, QVBoxLayout, \
     QWidget, QHBoxLayout, QSizePolicy
-from qfluentwidgets import LineEdit, PushButton, MessageBox, TextEdit, StrongBodyLabel, BodyLabel
+from qfluentwidgets import LineEdit, PushButton, MessageBox, TextEdit, StrongBodyLabel, BodyLabel, InfoBar, InfoBarIcon, \
+    InfoBarPosition
 
 from src.common.const import Status
 from src.common.exception import N2NGuiException
 from src.common.logger import Logger
 from src.model.log_monitor_thread import LogMonitorThread
 from src.model.n2n_edge_thread import N2NEdgeThread
+from src.tools.broadcast_tool import BroadcastTool
 from src.tools.config import Config
+from src.view.tool import Info
 
 
 class HomeWidget(QWidget):
@@ -78,6 +81,7 @@ class N2NEdgeWidget(QWidget):
         self.layout.addWidget(self.run_button)
 
         self.n2n_edge_thread = N2NEdgeThread(self)
+        self.broadcast_tool = BroadcastTool()
         # self.n2n_edge_thread = N2NEdgeThread()
         self.n2n_edge_thread.status_signal.connect(self.update_status)
 
@@ -116,16 +120,20 @@ class N2NEdgeWidget(QWidget):
                 self.run_button.setEnabled(False)
                 # 运行程序
                 self.n2n_edge_thread.start()
+                if self.config.is_run_broadcast:
+                    self.broadcast_tool.run_process()
             elif self.n2n_edge_thread.get_status() in Status.ENABLE_STOP:
                 self.run_button.setEnabled(False)
-                self.n2n_edge_thread.stop()
+                self.broadcast_tool.terminate_process()
+                if self.config.is_run_broadcast:
+                    self.n2n_edge_thread.stop()
 
         except N2NGuiException as e:
             Logger().error(traceback.format_exc())
-            MessageBox("错误", e.args[0], parent=self.parent())
+            Info.createErrorInfoBar(str(e.args[0]), parent=self.parent()).show()
         except Exception as e:
             Logger().error(traceback.format_exc())
-            MessageBox("错误", "未知错误，详情请见日志", parent=self.parent())
+            Info.createErrorInfoBar("未知错误，详情请见日志", parent=self.parent()).show()
 
 
 class LogMonitorWidget(QWidget):

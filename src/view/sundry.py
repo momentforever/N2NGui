@@ -7,8 +7,9 @@ from qfluentwidgets import PushButton, MessageBox, CheckBox
 from src.common.exception import N2NGuiException
 from src.common.logger import Logger
 from src.tools.config import Config
-from src.tools.intall_tool import InstallTool
+from src.tools.install_tool import InstallTool
 from src.tools.startup_tool import StartupTool
+from src.view.tool import Info
 
 
 class SundryWidget(QWidget):
@@ -27,10 +28,15 @@ class SundryWidget(QWidget):
         self.install_nic_button.clicked.connect(self.install_nic_event)
         self.layout.addWidget(self.install_nic_button)
 
-        self.install_broadcast_button = PushButton(self)
-        self.install_broadcast_button.setText("安装广播插件(推荐)")
-        self.install_broadcast_button.clicked.connect(self.install_broadcast_event)
-        self.layout.addWidget(self.install_broadcast_button)
+        # self.install_broadcast_button = PushButton(self)
+        # self.install_broadcast_button.setText("安装广播插件(推荐)")
+        # self.install_broadcast_button.clicked.connect(self.install_broadcast_event)
+        # self.layout.addWidget(self.install_broadcast_button)
+        self.is_run_broadcast_check_box = CheckBox(self)
+        self.is_run_broadcast_check_box.setText("启用广播插件(推荐)")
+        self.is_run_broadcast_check_box.clicked.connect(self.is_run_broadcast_event)
+        self.layout.addWidget(self.is_run_broadcast_check_box)
+
 
         self.auto_startup_check_box = CheckBox(self)
         self.auto_startup_check_box.setText("开机自启动")
@@ -41,6 +47,19 @@ class SundryWidget(QWidget):
 
     def load_setting(self):
         self.auto_startup_check_box.setChecked(self.config.is_auto_startup)
+        self.is_run_broadcast_check_box.setChecked(self.config.is_run_broadcast)
+
+    def is_run_broadcast_event(self):
+        Logger().debug("Is Run Broadcast Event")
+
+        if self.is_run_broadcast_check_box.isChecked():
+            Logger().info("Open run broadcast")
+            self.config.is_run_broadcast = True
+        else:
+            Logger().info("Close run broadcast")
+            self.config.is_run_broadcast = False
+
+        self.auto_startup_check_box.setChecked(self.config.is_auto_startup)
 
     def install_nic_event(self):
         Logger().debug("Install Nic Event")
@@ -48,21 +67,10 @@ class SundryWidget(QWidget):
             self.install_tool.install_nic()
         except N2NGuiException as e:
             Logger().error(traceback.format_exc())
-            MessageBox("错误", e.args[0], parent=self.parent())
+            Info.createErrorInfoBar(str(e.args[0]), parent=self.parent()).show()
         except Exception as e:
             Logger().error(traceback.format_exc())
-            MessageBox("错误", "未知错误，详情请见日志", parent=self.parent())
-
-    def install_broadcast_event(self):
-        Logger().debug("Install Broadcast Event")
-        try:
-            self.install_tool.install_broadcast()
-        except N2NGuiException as e:
-            Logger().error(traceback.format_exc())
-            MessageBox("错误", e.args[0], parent=self.parent())
-        except Exception as e:
-            Logger().error(traceback.format_exc())
-            MessageBox("错误", "未知错误，详情请见日志", parent=self.parent())
+            Info.createErrorInfoBar("未知错误，详情请见日志", parent=self.parent()).show()
 
     def auto_startup_event(self):
         Logger().debug("Auto Startup Event")
@@ -78,10 +86,10 @@ class SundryWidget(QWidget):
 
         except N2NGuiException as e:
             Logger().error(traceback.format_exc())
-            MessageBox("错误", e.args[0], parent=self.parent())
+            Info.createErrorInfoBar(str(e.args[0]), parent=self.parent()).show()
         except Exception as e:
             Logger().error(traceback.format_exc())
-            MessageBox("错误", "未知错误，详情请见日志", parent=self.parent())
+            Info.createErrorInfoBar("未知错误，详情请见日志", parent=self.parent()).show()
         finally:
             self.auto_startup_check_box.setChecked(self.config.is_auto_startup)
 

@@ -1,3 +1,4 @@
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtWidgets import QSystemTrayIcon, QApplication, QSizePolicy
 from qfluentwidgets import *
@@ -50,7 +51,7 @@ class MainWindow(MSFluentWindow):
         # screen_resolution = QApplication.desktop().screenGeometry()
         # width, height = screen_resolution.width() * 0.4, screen_resolution.height() * 0.3
         # self.resize(int(width), int(height))
-        self.resize(800, 400)
+        self.resize(900, 500)
 
     def _init_system_bar(self):
         # 创建系统托盘菜单
@@ -74,9 +75,14 @@ class MainWindow(MSFluentWindow):
 
         # 设置系统托盘菜单
         self.tray_icon.setContextMenu(self.menu)
+        self.tray_icon.activated.connect(self.on_tray_icon_activated)
 
         # 显示系统托盘图标
         self.tray_icon.show()
+
+    def on_tray_icon_activated(self, reason):
+        if reason == QSystemTrayIcon.DoubleClick:
+            self.showNormal()
 
     def update_n2n_edge_status(self, status):
         if status == Status.ON:
@@ -95,6 +101,7 @@ class MainWindow(MSFluentWindow):
         self.hide()
         Config().save()
         self.home_interface.log_monitor_widget.log_monitor_thread.stop_wait()
+        self.home_interface.n2n_edge_widget.broadcast_tool.terminate_process_wait()
         self.home_interface.n2n_edge_widget.n2n_edge_thread.stop_wait()
         QApplication.quit()
 

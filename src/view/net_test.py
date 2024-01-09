@@ -9,6 +9,7 @@ from src.common.exception import N2NGuiException
 from src.common.logger import Logger
 from src.tools.n2n_edge_tool import N2NEdgeTool
 from src.tools.net_test_tool import NetTestTool
+from src.view.tool import Info
 
 
 class NetTestWidget(QWidget):
@@ -27,6 +28,7 @@ class NetTestWidget(QWidget):
         self.layout.addWidget(self.info_label)
 
         self.net_test_tool = NetTestTool()
+
     def search_edge_event(self):
         try:
             if N2NEdgeTool().process_status != Status.ON:
@@ -42,7 +44,7 @@ class NetTestWidget(QWidget):
             self.info_label.setText(info)
         except N2NGuiException as e:
             Logger().error(traceback.format_exc())
-            MessageBox("错误", e.args[0], parent=self.parent())
+            Info.createErrorInfoBar(str(e.args[0]), parent=self.parent()).show()
         except Exception as e:
             Logger().error(traceback.format_exc())
-            MessageBox("错误", "未知错误，详情请见日志", parent=self.parent())
+            Info.createErrorInfoBar("未知错误，详情请见日志", parent=self.parent()).show()

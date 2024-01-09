@@ -99,7 +99,6 @@ class N2NEdgeTool(metaclass=Singleton):
 
             time.sleep(0.1)  # 等待
 
-        self._process.wait()
         self.process_status = Status.OFF
         Logger().info("Stopped n2n edge process!")
 

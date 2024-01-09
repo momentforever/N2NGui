@@ -44,3 +44,15 @@ class InstallTool(metaclass=Singleton):
             raise N2NGuiException("请以管理员身份运行") from e
         except Exception as e:
             Logger().error(traceback.format_exc())
+
+    def install_broadcast(self):
+        try:
+            Logger().info(f"Install BROADCAST Path: {Path.BROADCAST_PATH}")
+            process = subprocess.Popen([Path.BROADCAST_PATH, "install"],
+                                       stderr=subprocess.DEVNULL,
+                                       stdout=subprocess.DEVNULL,
+                                       shell=True)
+        except (PermissionError, WindowsError) as e:
+            raise N2NGuiException("请以管理员身份运行") from e
+        except Exception as e:
+            Logger().error(traceback.format_exc())
