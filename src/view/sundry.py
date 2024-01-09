@@ -1,3 +1,5 @@
+import traceback
+
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, \
@@ -41,27 +43,29 @@ class SundryWidget(QWidget):
         try:
             self.nic_tool.install()
         except N2NGuiException as e:
+            Logger().error(traceback.format_exc())
             MessageBox("错误", e.args[0], parent=self.parent())
         except Exception as e:
-            Logger().error(e)
+            Logger().error(traceback.format_exc())
             MessageBox("错误", "未知错误，详情请见日志", parent=self.parent())
 
     def auto_startup_event(self):
         Logger().debug("Auto Startup Event")
         try:
             if self.auto_startup_check_box.isChecked():
-                Logger().info("Open Auto Startup")
+                Logger().info("Open auto startup")
                 self.startup_tool.add_to()
                 self.config.is_auto_startup = True
             else:
-                Logger().info("Close Auto Startup")
+                Logger().info("Close auto startup")
                 self.startup_tool.delete_from()
                 self.config.is_auto_startup = False
 
         except N2NGuiException as e:
+            Logger().error(traceback.format_exc())
             MessageBox("错误", e.args[0], parent=self.parent())
         except Exception as e:
-            Logger().error(e)
+            Logger().error(traceback.format_exc())
             MessageBox("错误", "未知错误，详情请见日志", parent=self.parent())
         finally:
             self.auto_startup_check_box.setChecked(self.config.is_auto_startup)

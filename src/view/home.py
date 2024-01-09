@@ -1,3 +1,5 @@
+import traceback
+
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, \
@@ -18,10 +20,10 @@ class HomeWidget(QWidget):
         self.setObjectName("Home")
 
         self.layout = QHBoxLayout(self)
-        self.n2n_edge_view = N2NEdgeWidget(parent=self.parent())
-        self.layout.addWidget(self.n2n_edge_view, 1)
-        self.log_monitor_view = LogMonitorWidget(parent=self.parent())
-        self.layout.addWidget(self.log_monitor_view, 2)
+        self.n2n_edge_widget = N2NEdgeWidget(parent=self.parent())
+        self.layout.addWidget(self.n2n_edge_widget, 1)
+        self.log_monitor_widget = LogMonitorWidget(parent=self.parent())
+        self.layout.addWidget(self.log_monitor_widget, 2)
 
 
 class N2NEdgeWidget(QWidget):
@@ -37,7 +39,7 @@ class N2NEdgeWidget(QWidget):
 
         self.layout = QVBoxLayout(self)
 
-        self.supernode_label = StrongBodyLabel("超级节点地址和端口：")
+        self.supernode_label = StrongBodyLabel("Supernode地址和端口：")
         self.supernode_entry = LineEdit()
         self.supernode_entry.setPlaceholderText("必填")
         self.layout.addWidget(self.supernode_label)
@@ -56,7 +58,7 @@ class N2NEdgeWidget(QWidget):
         self.layout.addWidget(self.edge_community_password_label)
         self.layout.addWidget(self.edge_community_password_entry)
 
-        self.edge_ip_label = BodyLabel("Edge IP 地址：")
+        self.edge_ip_label = BodyLabel("Edge地址：")
         self.edge_ip_entry = LineEdit()
         self.layout.addWidget(self.edge_ip_label)
         self.layout.addWidget(self.edge_ip_entry)
@@ -81,7 +83,7 @@ class N2NEdgeWidget(QWidget):
             if self.config.is_auto_startup:
                 self.run_n2n_edge_event()
         except Exception as e:
-            Logger().error("Auto Startup Failed! Detail Info:")
+            Logger().error("Auto startup failed! Detail info:")
             Logger().error(e)
 
     def update_status(self, status):
@@ -91,12 +93,14 @@ class N2NEdgeWidget(QWidget):
             self.edge_community_password_entry.setEnabled(False)
             self.edge_community_entry.setEnabled(False)
             self.edge_ip_entry.setEnabled(False)
+            self.run_button.setEnabled(True)
             self.run_button.setText("终止")
         elif status == Status.OFF:
             self.supernode_entry.setEnabled(True)
             self.edge_community_password_entry.setEnabled(True)
             self.edge_community_entry.setEnabled(True)
             self.edge_ip_entry.setEnabled(True)
+            self.run_button.setEnabled(True)
             self.run_button.setText("运行")
 
     def run_n2n_edge_event(self):
@@ -107,18 +111,18 @@ class N2NEdgeWidget(QWidget):
                 self.config.edge_ip = self.edge_ip_entry.text()
                 self.config.edge_community = self.edge_community_entry.text()
                 self.config.edge_community_password = self.edge_community_password_entry.text()
+                self.run_button.setEnabled(False)
                 # 运行程序
                 self.n2n_edge.start()
             elif self.n2n_edge.get_status() in Status.ENABLE_STOP:
+                self.run_button.setEnabled(False)
                 self.n2n_edge.stop()
-            else:
-                Logger().warning(f"Couldn't operate N2N edge, Current status: "
-                                 f"{Status.to_str(self.n2n_edge.get_status())}")
 
         except N2NGuiException as e:
+            Logger().error(traceback.format_exc())
             MessageBox("错误", e.args[0], parent=self.parent())
         except Exception as e:
-            Logger().error(e)
+            Logger().error(traceback.format_exc())
             MessageBox("错误", "未知错误，详情请见日志", parent=self.parent())
 
 

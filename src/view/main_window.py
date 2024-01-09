@@ -1,3 +1,5 @@
+import time
+
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QFont
@@ -17,12 +19,11 @@ from src.view.sundry import SundryWidget
 
 
 class MainWindow(MSFluentWindow):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._init_window()
         self._init_center()
         self._init_system_bar()
-
         self.show()
 
     def _init_center(self):
@@ -34,6 +35,8 @@ class MainWindow(MSFluentWindow):
         self.addSubInterface(self.advanced_setting_interface, FIF.DEVELOPER_TOOLS, '高级')
         self.addSubInterface(self.net_test_interface, FIF.EDIT, '测试')
         self.addSubInterface(self.sundry_interface, FIF.SETTING, '设置')
+
+        self.home_interface.n2n_edge_widget.n2n_edge_status_signal.connect(self.update_n2n_edge_status)
 
     def _init_window(self):
         self.font = QFont()
@@ -50,11 +53,10 @@ class MainWindow(MSFluentWindow):
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
 
         # 设置窗口默认大小
-        screen_resolution = QApplication.desktop().screenGeometry()
-        width, height = screen_resolution.width() * 0.4, screen_resolution.height() * 0.3
-        self.resize(int(width), int(height))
-
-        self.home_interface.n2n_edge_view.n2n_edge_status_signal.connect(self.update_n2n_edge_status)
+        # screen_resolution = QApplication.desktop().screenGeometry()
+        # width, height = screen_resolution.width() * 0.4, screen_resolution.height() * 0.3
+        # self.resize(int(width), int(height))
+        self.resize(800, 400)
 
     def _init_system_bar(self):
         # 创建系统托盘菜单
@@ -95,8 +97,12 @@ class MainWindow(MSFluentWindow):
         self.hide()
 
     def close_event(self):
-        self.close()
+        self.tray_icon.hide()
+        self.hide()
+        Config().save()
+        N2NEdgeTool().terminate_process_wait()
+        QApplication.quit()
 
     def closeEvent(self, event):
-        N2NEdgeTool().terminate_process_wait()
-        Config().save()
+        event.ignore()
+        self.hide()

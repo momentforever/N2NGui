@@ -1,7 +1,9 @@
+import shlex
 import signal
 import socket
 import subprocess
 import time
+import traceback
 
 from src.common.singleton import Singleton
 from src.common.const import *
@@ -46,12 +48,12 @@ class N2NEdgeTool(metaclass=Singleton):
         if self._config.edge_description:
             cmd.append("-I")
             cmd.append(str(self._config.edge_description))
-
         if self._config.edge_etc_args:
             for edge_etc_arg in self._config.edge_etc_args:
-                if edge_etc_arg.startswith("#"):
+                edge_etc_arg = edge_etc_arg.split("#")[0]
+                if len(edge_etc_arg) == 0:
                     continue
-                cmd += edge_etc_arg
+                cmd += shlex.split(edge_etc_arg)
 
         Logger().info(f'Start n2n edge command is {" ".join(cmd)}')
 
@@ -65,7 +67,7 @@ class N2NEdgeTool(metaclass=Singleton):
 
     def run_process(self):
         if self.process_status not in Status.ENABLE_START:
-            Logger().warning(f"couldn't start n2n edg2, \
+            Logger().warning(f"Couldn't start n2n edg2, \
                              current status is {Status.to_str(self.process_status)}")
             return
 
@@ -91,9 +93,8 @@ class N2NEdgeTool(metaclass=Singleton):
             time.sleep(0.1)  # 等待
 
         self._process.wait()
-        Logger().info("Terminate n2n edge process!")
-        self._process = None
-        self.process_status = Status.STOPPED
+        self.process_status = Status.OFF
+        Logger().info("Stopped n2n edge process!")
 
     def terminate_process(self):
         # 未启动
@@ -104,39 +105,39 @@ class N2NEdgeTool(metaclass=Singleton):
             return
 
         try:
-            Logger().info("Terminate n2n edge process...")
+            Logger().info("Stopping n2n edge process...")
             self.process_status = Status.STOPPING
-            self._send_stop_package()
+            self._send_stop_package() # 终止进程
             # self._process.terminate()  # 终止进程
         except Exception as e:
-            Logger().error(e)
+            Logger().error(traceback.format_exc())
             raise N2NGuiException("停止进程失败") from e
 
+
+
     def terminate_process_wait(self):
+        # 未启动
+        if not self._process:
+            return
+        # 已经终止
+        if self._process.poll() is not None:
+            return
         self.terminate_process()
-        while True:
-            if not self._process:
-                break
-            if self._process.poll() is not None:
-                break
-        Logger().info("Process stopped")
-
-    def _send_stop_package(self) -> str:
-        result = ""
         try:
-            # 创建UDP套接字
-            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            sock.settimeout(3)
-            # 目标主机和端口
-            target_host = 'localhost'
-            target_port = 5644
-            # 要发送的数据
-            send_data = b'stop\n'
-            # 发送数据包
-            sock.sendto(send_data, (target_host, target_port))
+            self._process.wait(3)
+        except subprocess.TimeoutExpired:
+            Logger().warning("Abnormal stop n2n edge!")
+        Logger().info("Wait until stopping n2n edge process finish!")
 
-            sock.close()
-        except Exception as e:
-            pass
-        finally:
-            return result
+    def _send_stop_package(self):
+        # 创建UDP套接字
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # 目标主机和端口
+        target_host = 'localhost'
+        target_port = 5644
+        # 要发送的数据
+        send_data = b'stop\n'
+        # 发送数据包
+        sock.sendto(send_data, (target_host, target_port))
+
+        sock.close()

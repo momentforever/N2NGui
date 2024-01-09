@@ -1,5 +1,8 @@
 import ctypes
-import winreg
+try:
+    import winreg
+except ImportError:
+    pass
 
 from src.common.const import *
 from src.common.exception import *

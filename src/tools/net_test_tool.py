@@ -14,20 +14,6 @@ class NetConfig:
         self.mac = ""
 
 class NetTestTool(metaclass=Singleton):
-    # @staticmethod
-    # def ping(host, max_tried=4):
-    #     # Window
-    #     result = subprocess.run(['ping', '-n', str(max_tried), host],
-    #                             capture_output=True, text=True)
-    #     # 获取ping命令的输出结果
-    #     output = result.stdout
-    #
-    #     # 检查输出结果来确定连接是否成功
-    #     if "Reply from" in output:
-    #         return True
-    #     else:
-    #         return False
-
     def _get_udp_package(self) -> str:
         result = ""
         try:

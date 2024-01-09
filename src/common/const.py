@@ -9,16 +9,15 @@ class Status:
     """
     运行状态
     """
-    OFF = 0
     STARTING = 1
     ON = 2
     STOPPING = 3
-    STOPPED = 4
+    OFF = 4
     KILLED = 5
     FAILED = 6
 
     ENABLE_STOP = [ON]
-    ENABLE_START = [OFF, STOPPED, KILLED, FAILED]
+    ENABLE_START = [OFF, KILLED, FAILED]
     _strs = [
         "off",
         "starting",

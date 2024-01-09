@@ -1,3 +1,5 @@
+import traceback
+
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, \
@@ -41,7 +43,8 @@ class NetTestWidget(QWidget):
                     info = "未查询到其他Edge IP"
             self.info_label.setText(info)
         except N2NGuiException as e:
+            Logger().error(traceback.format_exc())
             MessageBox("错误", e.args[0], parent=self.parent())
         except Exception as e:
-            Logger().error(e)
+            Logger().error(traceback.format_exc())
             MessageBox("错误", "未知错误，详情请见日志", parent=self.parent())

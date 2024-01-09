@@ -13,12 +13,14 @@ class N2NEdgeThread(QThread):
     def run(self):
         self._set_status_signal(Status.ON)
         self.n2n_edge.run_process()
+        self._set_status_signal(Status.OFF)
 
     def stop(self):
         self.n2n_edge.terminate_process()
+
+    def stop_wait(self):
+        self.n2n_edge.terminate_process()
         self.wait()
-        self.n2n_edge.process_status = Status.OFF
-        self._set_status_signal(Status.OFF)
 
     def get_status(self):
         return self.n2n_edge.process_status
