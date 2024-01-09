@@ -1,4 +1,5 @@
 import subprocess
+import traceback
 import zipfile
 
 from src.common.const import *
@@ -7,7 +8,7 @@ from src.common.logger import Logger
 from src.common.singleton import Singleton
 
 
-class NicTool(metaclass=Singleton):
+class InstallTool(metaclass=Singleton):
     def _unzip_nic(self):
         if os.path.exists(Path.NIC_PATH):
             return
@@ -19,7 +20,7 @@ class NicTool(metaclass=Singleton):
         with zipfile.ZipFile(Path.NIC_ZIP_PATH, 'r') as zip_ref:
             zip_ref.extractall(Path.NIC_UNZIP_DIR)
 
-    def install(self):
+    def install_nic(self):
         self._unzip_nic()
         try:
             Logger().info(f"Install Nic Path: {Path.NIC_PATH}")
@@ -30,4 +31,16 @@ class NicTool(metaclass=Singleton):
         except (PermissionError, WindowsError) as e:
             raise N2NGuiException("请以管理员身份运行") from e
         except Exception as e:
-            Logger().error(e)
+            Logger().error(traceback.format_exc())
+
+    def install_broadcast(self):
+        try:
+            Logger().info(f"Install BROADCAST Path: {Path.BROADCAST_PATH}")
+            process = subprocess.Popen([Path.BROADCAST_PATH, "install"],
+                                       stderr=subprocess.DEVNULL,
+                                       stdout=subprocess.DEVNULL,
+                                       shell=True)
+        except (PermissionError, WindowsError) as e:
+            raise N2NGuiException("请以管理员身份运行") from e
+        except Exception as e:
+            Logger().error(traceback.format_exc())

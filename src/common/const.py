@@ -54,3 +54,4 @@ class Path:
     NIC_ZIP_PATH = os.path.join(WORKER_DIR, "tools\\tap-windows.zip")
     NIC_UNZIP_DIR = os.path.join(WORKER_DIR, "tools")
     NIC_PATH = os.path.join(WORKER_DIR, "tools\\tap-windows\\9.21.2.exe")
+    BROADCAST_PATH = os.path.join(WORKER_DIR, "tools\\WinIPBroadcast-1.6.exe")
