@@ -101,7 +101,6 @@ class MainWindow(MSFluentWindow):
         self.hide()
         Config().save()
         self.home_interface.log_monitor_widget.log_monitor_thread.stop_wait()
-        self.home_interface.n2n_edge_widget.broadcast_tool.terminate_process_wait()
         self.home_interface.n2n_edge_widget.n2n_edge_thread.stop_wait()
         QApplication.quit()
 
