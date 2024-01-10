@@ -20,7 +20,7 @@ class N2NEdgeThread(QThread):
 
     def stop_wait(self):
         self.n2n_edge.terminate_process()
-        self.wait(5000)
+        self.wait(60 * 1000)
 
     def get_status(self):
         return self.n2n_edge.process_status

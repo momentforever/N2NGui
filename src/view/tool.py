@@ -11,6 +11,6 @@ class Info:
             orient=Qt.Horizontal,
             isClosable=True,
             position=InfoBarPosition.TOP_RIGHT,
-            duration=-1,    # won't disappear automatically
+            duration=5 * 1000,    # won't disappear automatically
             parent=parent
         )

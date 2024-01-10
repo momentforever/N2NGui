@@ -16,10 +16,12 @@ from src.view.sundry import SundryWidget
 class MainWindow(MSFluentWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.config = Config()
         self._init_window()
         self._init_center()
         self._init_system_bar()
-        self.show()
+        if not self.config.is_auto_startup:
+            self.show()
 
     def _init_center(self):
         self.home_interface = HomeWidget(parent=self)
@@ -99,7 +101,7 @@ class MainWindow(MSFluentWindow):
     def close_event(self):
         self.tray_icon.hide()
         self.hide()
-        Config().save()
+        self.config.save()
         self.home_interface.log_monitor_widget.log_monitor_thread.stop_wait()
         self.home_interface.n2n_edge_widget.n2n_edge_thread.stop_wait()
         QApplication.quit()
