@@ -1,3 +1,4 @@
+import re
 import shlex
 import signal
 import socket
@@ -19,33 +20,65 @@ class N2NEdgeTool(metaclass=Singleton):
         self._process: subprocess.Popen = None
         self._config: Config = Config()
 
+    def _is_legal_ipv4(self, string):
+        pattern = re.compile(r'^(\d{1,3}\.){3}\d{1,3}$')
+        match = pattern.search(string)
+        if match:
+            return True
+        else:
+            return False
+
+    def _is_legal_host(self, string):
+        pattern = re.compile(r'[^a-zA-Z0-9:]')
+        match = pattern.search(string)
+        if match:
+            return True
+        else:
+            return False
+
+    def _is_legal_chars(self, string):
+        pattern = re.compile(r'[^a-zA-Z0-9_]')
+        match = pattern.search(string)
+        if match:
+            return True
+        else:
+            return False
+
     def _generate_cmd(self):
         cmd = []
         cmd.append(Path.EDGE_PATH)
 
-        if not self._config.supernode:
-            raise N2NGuiException("缺少服务器节点")
+        if not self._is_legal_host(self._config.supernode):
+            raise N2NGuiException("Supernode参数异常")
         cmd.append("-l")
         cmd.append(str(self._config.supernode))
 
-        if not self._config.edge_community:
-            raise N2NGuiException("缺少服务器群组名")
+        if not self._is_legal_chars(self._config.edge_community):
+            raise N2NGuiException("小组名称参数异常")
         cmd.append("-c")
         cmd.append(str(self._config.edge_community))
 
         if self._config.edge_community_password:
+            if not self._is_legal_chars(self._config.edge_community_password):
+                raise N2NGuiException("小组密码参数异常")
             cmd.append("-k")
             cmd.append(str(self._config.edge_community_password))
 
         if self._config.edge_ip:
+            if not self._is_legal_ipv4(self._config.edge_ip):
+                raise N2NGuiException("Edge地址参数异常")
             cmd.append("-a")
             cmd.append(str(self._config.edge_ip))
 
         if self._config.edge_package_size:
+            if not isinstance(self._config.edge_package_size, int):
+                raise N2NGuiException("包大小参数异常")
             cmd.append("-M")
             cmd.append(str(self._config.edge_package_size))
 
         if self._config.edge_description:
+            if not self._is_legal_chars(self._config.edge_description):
+                raise N2NGuiException("设备描述参数异常")
             cmd.append("-I")
             cmd.append(str(self._config.edge_description))
 

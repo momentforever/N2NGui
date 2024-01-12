@@ -35,7 +35,7 @@ class Config(metaclass=Singleton):
         self.edge_package_size = 1386
         self.edge_description = ""
         self.edge_etc_args = []
-        self.is_first_start = False
+        self.is_first_start = True
         self.is_auto_startup = False
         # TODO
         # self.is_auto_restart = False

@@ -35,6 +35,12 @@ class MainWindow(MSFluentWindow):
         self.addSubInterface(self.net_test_interface, FIF.EDIT, '测试')
         self.addSubInterface(self.sundry_interface, FIF.SETTING, '设置')
 
+        if self.config.is_first_start:
+            self.switchTo(self.sundry_interface)
+        else:
+            self.switchTo(self.home_interface)
+
+
         self.home_interface.n2n_edge_widget.n2n_edge_status_signal.connect(self.update_n2n_edge_status)
 
     def _init_window(self):
@@ -104,6 +110,7 @@ class MainWindow(MSFluentWindow):
         QApplication.quit()
 
     def close_handler(self):
+        Logger().info("Closing Window...")
         self.tray_icon.hide()
         self.hide()
         self.config.save()

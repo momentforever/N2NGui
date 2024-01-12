@@ -61,7 +61,6 @@ class N2NEdgeWidget(QWidget):
         self.edge_community_password_label = BodyLabel(self)
         self.edge_community_password_label.setText("小组密码：")
         self.edge_community_password_entry = LineEdit(self)
-        self.edge_community_password_entry.setPlaceholderText("必填")
         self.edge_community_password_entry.setEchoMode(QLineEdit.Password)
         self.edge_community_password_entry.setText(self.config.edge_community_password)
         self.layout.addWidget(self.edge_community_password_label)
@@ -81,16 +80,22 @@ class N2NEdgeWidget(QWidget):
 
         self.n2n_edge_thread = N2NEdgeThread(self)
         # self.n2n_edge_thread = N2NEdgeThread()
-        self.n2n_edge_thread.status_signal.connect(self.update_status)
+        self.n2n_edge_thread.status_signal.connect(self.update_status_handler)
+        self.n2n_edge_thread.exception_signal.connect(self.edge_exception_handler)
+        if self.config.is_auto_startup:
+            self.run_n2n_edge_event()
 
+    def edge_exception_handler(self, e):
         try:
-            if self.config.is_auto_startup:
-                self.run_n2n_edge_event()
+            raise e
+        except N2NGuiException as e:
+            Logger().error(traceback.format_exc())
+            Info.createErrorInfoBar(str(e.args[0]), parent=self.parent()).show()
         except Exception as e:
-            Logger().error("Auto startup failed! Detail info:")
-            Logger().error(e)
+            Logger().error(traceback.format_exc())
+            Info.createErrorInfoBar("未知错误，详情请见日志", parent=self.parent()).show()
 
-    def update_status(self, status):
+    def update_status_handler(self, status):
         self.n2n_edge_status_signal.emit(status)
         if status == Status.ON:
             self.supernode_entry.setEnabled(False)
@@ -115,23 +120,15 @@ class N2NEdgeWidget(QWidget):
 
     def run_n2n_edge_event(self):
         Logger().debug("Run N2N Edge Event")
-        try:
-            if self.n2n_edge_thread.get_status() in Status.ENABLE_START:
-                self.save_config()
-                self.run_button.setEnabled(False)
-                # 运行程序
-                self.n2n_edge_thread.start()
-            elif self.n2n_edge_thread.get_status() in Status.ENABLE_STOP:
-                self.run_button.setEnabled(False)
-                # 终止程序
-                self.n2n_edge_thread.stop()
-
-        except N2NGuiException as e:
-            Logger().error(traceback.format_exc())
-            Info.createErrorInfoBar(str(e.args[0]), parent=self.parent()).show()
-        except Exception as e:
-            Logger().error(traceback.format_exc())
-            Info.createErrorInfoBar("未知错误，详情请见日志", parent=self.parent()).show()
+        if self.n2n_edge_thread.get_status() in Status.ENABLE_START:
+            self.save_config()
+            self.run_button.setEnabled(False)
+            # 运行程序
+            self.n2n_edge_thread.start()
+        elif self.n2n_edge_thread.get_status() in Status.ENABLE_STOP:
+            self.run_button.setEnabled(False)
+            # 终止程序
+            self.n2n_edge_thread.stop()
 
     def leaveEvent(self, a0):
         self.save_config()

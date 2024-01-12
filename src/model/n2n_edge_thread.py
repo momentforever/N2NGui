@@ -8,11 +8,15 @@ from src.tools.n2n_edge_tool import N2NEdgeTool
 
 class N2NEdgeThread(QThread):
     status_signal = pyqtSignal(int)
+    exception_signal = pyqtSignal(Exception)
     n2n_edge = N2NEdgeTool()
 
     def run(self):
         self._set_status_signal(Status.ON)
-        self.n2n_edge.run_process()
+        try:
+            self.n2n_edge.run_process()
+        except Exception as e:
+            self.exception_signal.emit(e)
         self._set_status_signal(Status.OFF)
 
     def stop(self):

@@ -55,3 +55,7 @@ class Path:
     NIC_UNZIP_DIR = os.path.join(WORKER_DIR, "tools")
     NIC_PATH = os.path.join(WORKER_DIR, "tools\\tap-windows\\9.21.2.exe")
     BROADCAST_PATH = os.path.join(WORKER_DIR, "tools\\WinIPBroadcast-1.6.exe")
+
+N2NGUI_COPYRIGHT = "Copyright@2023"
+N2NGUI_AUTHOR = "moment_forever"
+N2NGUI_VERSION = "1.2.0_alpha"

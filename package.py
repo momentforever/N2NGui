@@ -1,6 +1,6 @@
 import os
 import shutil
-
+from src.common.const import N2NGUI_VERSION
 import PyInstaller.__main__
 
 import zipfile
@@ -23,6 +23,7 @@ worker_dir = os.getcwd()
 source_file = 'main.py'
 project_name = 'N2NGui'
 package_dir = ".\\N2NGui"
+zip_path = f".\\N2NGui_{N2NGUI_VERSION}.zip"
 icon_file = ".\\statics\\icon_48.ico"
 
 options = [
@@ -47,10 +48,8 @@ shutil.copytree("statics", os.path.join(package_dir, "statics"))
 shutil.copytree("tools", os.path.join(package_dir, "tools"))
 shutil.copy(os.path.join(".\\dist", f"{project_name}.exe"), package_dir)
 
-if os.path.exists(f'.\\{project_name}.zip'):
-    os.remove(f'.\\{project_name}.zip')
 # 压缩文件
-compress_folder(package_dir, f'.\\{project_name}.zip')
+compress_folder(package_dir, zip_path)
 
 # 删除不需要的中间内容
 delete_files = [
