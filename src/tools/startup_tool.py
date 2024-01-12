@@ -35,16 +35,14 @@ class StartupTool(metaclass=Singleton):
                 i = 0
                 while True:
                     value_name = winreg.EnumValue(key, i)[0]
-                    value_names.append(value_name)
+                    if self.REG_NAME == value_name:
+                        return True
                     i += 1
             except OSError:
                 pass
 
-            # 检查是否存在与您的软件相关的值名称
-            if self.REG_NAME in value_names:
-                return False
-            else:
-                return False
+            return False
+
         except FileNotFoundError:
             return False
 
@@ -73,6 +71,7 @@ class StartupTool(metaclass=Singleton):
             return
 
         try:
+            Logger().info(f"Delete {Path.EXE_PATH} to start up!")
             # 打开注册表项
             key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
                                  self.START_KEY,

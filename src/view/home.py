@@ -107,14 +107,17 @@ class N2NEdgeWidget(QWidget):
             self.run_button.setEnabled(True)
             self.run_button.setText("运行")
 
+    def save_config(self):
+        self.config.supernode = self.supernode_entry.text()
+        self.config.edge_ip = self.edge_ip_entry.text()
+        self.config.edge_community = self.edge_community_entry.text()
+        self.config.edge_community_password = self.edge_community_password_entry.text()
+
     def run_n2n_edge_event(self):
         Logger().debug("Run N2N Edge Event")
         try:
             if self.n2n_edge_thread.get_status() in Status.ENABLE_START:
-                self.config.supernode = self.supernode_entry.text()
-                self.config.edge_ip = self.edge_ip_entry.text()
-                self.config.edge_community = self.edge_community_entry.text()
-                self.config.edge_community_password = self.edge_community_password_entry.text()
+                self.save_config()
                 self.run_button.setEnabled(False)
                 # 运行程序
                 self.n2n_edge_thread.start()
@@ -129,6 +132,9 @@ class N2NEdgeWidget(QWidget):
         except Exception as e:
             Logger().error(traceback.format_exc())
             Info.createErrorInfoBar("未知错误，详情请见日志", parent=self.parent()).show()
+
+    def leaveEvent(self, a0):
+        self.save_config()
 
 
 class LogMonitorWidget(QWidget):

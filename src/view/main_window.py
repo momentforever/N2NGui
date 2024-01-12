@@ -5,6 +5,7 @@ from qfluentwidgets import *
 from qfluentwidgets import FluentIcon as FIF
 
 from src.common.const import *
+from src.common.logger import Logger
 from src.tools.config import Config
 from src.tools.n2n_edge_tool import N2NEdgeTool
 from src.view.advanced_setting import AdvancedSettingWidget
@@ -20,8 +21,9 @@ class MainWindow(MSFluentWindow):
         self._init_window()
         self._init_center()
         self._init_system_bar()
-        if not self.config.is_auto_startup:
-            self.show()
+        self.show()
+        if self.config.is_auto_startup:
+            self.hide()
 
     def _init_center(self):
         self.home_interface = HomeWidget(parent=self)
@@ -99,11 +101,12 @@ class MainWindow(MSFluentWindow):
         self.hide()
 
     def close_event(self):
+        Logger().info('Close Application Event')
         self.tray_icon.hide()
         self.hide()
         self.config.save()
-        self.home_interface.log_monitor_widget.log_monitor_thread.stop_wait()
         self.home_interface.n2n_edge_widget.n2n_edge_thread.stop_wait()
+        self.home_interface.log_monitor_widget.log_monitor_thread.stop_wait()
         QApplication.quit()
 
     def closeEvent(self, event):
