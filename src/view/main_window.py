@@ -22,6 +22,12 @@ class MainWindow(MSFluentWindow):
         self._init_center()
         self._init_system_bar()
         self.show()
+        if self.config.is_first_start:
+            m = MessageBox("快速开始", "首次运行需点击安装网卡驱动！", self)
+            if m.exec_():
+                self.switchTo(self.sundry_interface)
+            self.config.is_first_start = False
+
         if self.config.is_auto_startup:
             self.hide()
 
@@ -34,12 +40,6 @@ class MainWindow(MSFluentWindow):
         self.addSubInterface(self.advanced_setting_interface, FIF.DEVELOPER_TOOLS, '高级')
         self.addSubInterface(self.net_test_interface, FIF.EDIT, '测试')
         self.addSubInterface(self.sundry_interface, FIF.SETTING, '设置')
-
-        if self.config.is_first_start:
-            self.switchTo(self.sundry_interface)
-        else:
-            self.switchTo(self.home_interface)
-
 
         self.home_interface.n2n_edge_widget.n2n_edge_status_signal.connect(self.update_n2n_edge_status)
 

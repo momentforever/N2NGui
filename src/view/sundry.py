@@ -51,9 +51,7 @@ class SundryWidget(QWidget):
         self.about_card = AboutCard()
         self.layout.addWidget(self.about_card, alignment=Qt.AlignTop)
 
-        if Config().is_first_start:
-            MessageBox("快速开始", "首次运行需点击安装网卡驱动！", self)
-            Config().is_first_start = False
+
 
 class AboutCard(CardWidget):
     """ App card """
