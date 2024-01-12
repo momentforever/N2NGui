@@ -1,3 +1,4 @@
+import ipaddress
 import re
 import shlex
 import signal
@@ -20,23 +21,26 @@ class N2NEdgeTool(metaclass=Singleton):
         self._process: subprocess.Popen = None
         self._config: Config = Config()
 
-    def _is_legal_ipv4(self, string):
-        pattern = re.compile(r'^(\d{1,3}\.){3}\d{1,3}$')
+    def is_valid_ipv4_address(self, ip):
+        try:
+            ipaddress.IPv4Address(ip)
+            return True
+        except ipaddress.AddressValueError:
+            return False
+
+    def _has_illegal_host(self, string):
+        if not string:
+            return True
+        pattern = re.compile(r'[^a-zA-Z0-9:.]')
         match = pattern.search(string)
         if match:
             return True
         else:
             return False
 
-    def _is_legal_host(self, string):
-        pattern = re.compile(r'[^a-zA-Z0-9:]')
-        match = pattern.search(string)
-        if match:
+    def _has_illegal_chars(self, string):
+        if not string:
             return True
-        else:
-            return False
-
-    def _is_legal_chars(self, string):
         pattern = re.compile(r'[^a-zA-Z0-9_]')
         match = pattern.search(string)
         if match:
@@ -48,24 +52,24 @@ class N2NEdgeTool(metaclass=Singleton):
         cmd = []
         cmd.append(Path.EDGE_PATH)
 
-        if not self._is_legal_host(self._config.supernode):
+        if self._has_illegal_host(self._config.supernode):
             raise N2NGuiException("Supernode参数异常")
         cmd.append("-l")
         cmd.append(str(self._config.supernode))
 
-        if not self._is_legal_chars(self._config.edge_community):
+        if self._has_illegal_chars(self._config.edge_community):
             raise N2NGuiException("小组名称参数异常")
         cmd.append("-c")
         cmd.append(str(self._config.edge_community))
 
         if self._config.edge_community_password:
-            if not self._is_legal_chars(self._config.edge_community_password):
+            if self._has_illegal_chars(self._config.edge_community_password):
                 raise N2NGuiException("小组密码参数异常")
             cmd.append("-k")
             cmd.append(str(self._config.edge_community_password))
 
         if self._config.edge_ip:
-            if not self._is_legal_ipv4(self._config.edge_ip):
+            if not self.is_valid_ipv4_address(self._config.edge_ip):
                 raise N2NGuiException("Edge地址参数异常")
             cmd.append("-a")
             cmd.append(str(self._config.edge_ip))
@@ -77,7 +81,7 @@ class N2NEdgeTool(metaclass=Singleton):
             cmd.append(str(self._config.edge_package_size))
 
         if self._config.edge_description:
-            if not self._is_legal_chars(self._config.edge_description):
+            if self._has_illegal_chars(self._config.edge_description):
                 raise N2NGuiException("设备描述参数异常")
             cmd.append("-I")
             cmd.append(str(self._config.edge_description))
