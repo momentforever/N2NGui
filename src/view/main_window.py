@@ -101,13 +101,14 @@ class MainWindow(MSFluentWindow):
         self.hide()
 
     def close_event(self):
-        Logger().info('Close Application Event')
+        QApplication.quit()
+
+    def close_handler(self):
         self.tray_icon.hide()
         self.hide()
         self.config.save()
         self.home_interface.n2n_edge_widget.n2n_edge_thread.stop_wait()
         self.home_interface.log_monitor_widget.log_monitor_thread.stop_wait()
-        QApplication.quit()
 
     def closeEvent(self, event):
         event.ignore()

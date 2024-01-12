@@ -13,7 +13,7 @@ class MyApplication(QApplication):
         self.aboutToQuit.connect(self.onAboutToQuit)
 
     def onAboutToQuit(self):
-        self.window.close_event()
+        self.window.close_handler()
 
 
 class GUI:
