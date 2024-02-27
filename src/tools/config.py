@@ -70,12 +70,16 @@ class Config(metaclass=Singleton):
             yaml.safe_dump(yaml_cfg, yaml_file)
 
     def load(self):
-        if not os.path.exists(Path.CONFIG_PATH):
+        try:
+            with open(Path.CONFIG_PATH, 'r', encoding='utf-8') as yaml_file:
+                config_dict: Dict = yaml.safe_load(yaml_file)
+            if not isinstance(config_dict, Dict):
+                raise IOError("config empty")
+        except Exception as e:
             # 创建默认配置文件
             self.save()
-
-        with open(Path.CONFIG_PATH, 'r', encoding='utf-8') as yaml_file:
-            config_dict: Dict = yaml.safe_load(yaml_file)
+            with open(Path.CONFIG_PATH, 'r', encoding='utf-8') as yaml_file:
+                config_dict: Dict = yaml.safe_load(yaml_file)
 
         self.supernode = config_dict.get("supernode", self.supernode)
         self.edge_ip = config_dict.get("edge_ip", self.edge_ip)

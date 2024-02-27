@@ -10,7 +10,6 @@ from src.tools.config import Config
 from src.tools.n2n_edge_tool import N2NEdgeTool
 from src.view.advanced_setting import AdvancedSettingWidget
 from src.view.home import HomeWidget
-from src.view.net_test import NetTestWidget
 from src.view.sundry import SundryWidget
 
 
@@ -27,6 +26,7 @@ class MainWindow(MSFluentWindow):
             if m.exec_():
                 self.switchTo(self.sundry_interface)
             self.config.is_first_start = False
+            self.config.save()
 
         if self.config.is_auto_startup:
             self.hide()
@@ -35,10 +35,8 @@ class MainWindow(MSFluentWindow):
         self.home_interface = HomeWidget(parent=self)
         self.advanced_setting_interface = AdvancedSettingWidget(parent=self)
         self.sundry_interface = SundryWidget(parent=self)
-        self.net_test_interface = NetTestWidget(parent=self)
         self.addSubInterface(self.home_interface, FIF.HOME, '主页', FIF.HOME_FILL)
         self.addSubInterface(self.advanced_setting_interface, FIF.DEVELOPER_TOOLS, '高级')
-        self.addSubInterface(self.net_test_interface, FIF.EDIT, '测试')
         self.addSubInterface(self.sundry_interface, FIF.SETTING, '设置')
 
         self.home_interface.n2n_edge_widget.n2n_edge_status_signal.connect(self.update_n2n_edge_status)
@@ -113,7 +111,6 @@ class MainWindow(MSFluentWindow):
         Logger().info("Closing Window...")
         self.tray_icon.hide()
         self.hide()
-        self.config.save()
         self.home_interface.n2n_edge_widget.n2n_edge_thread.stop_wait()
         self.home_interface.log_monitor_widget.log_monitor_thread.stop_wait()
 
