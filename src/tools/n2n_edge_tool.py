@@ -9,7 +9,7 @@ import traceback
 
 from src.common.singleton import Singleton
 from src.common.const import *
-from src.tools.config import Config
+from src.tools.config import Config, N2NEdgeConfig
 from src.common.logger import Logger
 from src.common.exception import *
 
@@ -19,7 +19,8 @@ class N2NEdgeTool(metaclass=Singleton):
     def __init__(self):
         self.process_status: Status = Status.OFF
         self._process: subprocess.Popen = None
-        self._config: Config = Config()
+        self._config: N2NEdgeConfig = Config().get_cur_n2n_edge_config()
+
 
     def is_valid_ipv4_address(self, ip):
         try:
@@ -151,24 +152,24 @@ class N2NEdgeTool(metaclass=Singleton):
             Logger().info("Stopping n2n edge process...")
             self.process_status = Status.STOPPING
             self._send_stop_package()  # 终止进程
-            # self._process.terminate()  # 终止进程
         except Exception as e:
             Logger().error(traceback.format_exc())
             raise N2NGuiException("停止进程失败") from e
+    def terminate_process_force(self):
+        # 未启动
+        if not self._process:
+            return
+        # 已经终止
+        if self._process.poll() is not None:
+            return
 
-    # def terminate_process_wait(self):
-    #     # 未启动
-    #     if not self._process:
-    #         return
-    #     # 已经终止
-    #     if self._process.poll() is not None:
-    #         return
-    #     self.terminate_process()
-    #     try:
-    #         self._process.wait(3)
-    #     except subprocess.TimeoutExpired:
-    #         Logger().warning("Abnormal stop n2n edge!")
-    #     Logger().info("Wait until stopping n2n edge process finish!")
+        try:
+            Logger().info("Stopping n2n edge process...")
+            self.process_status = Status.STOPPING
+            self._process.terminate()  # 终止进程
+        except Exception as e:
+            Logger().error(traceback.format_exc())
+            raise N2NGuiException("停止进程失败") from e
 
     def _send_stop_package(self):
         # 创建UDP套接字

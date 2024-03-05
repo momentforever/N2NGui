@@ -34,6 +34,9 @@ class SundryWidget(QWidget):
         self.startup_card = StartUpCard()
         self.layout.addWidget(self.startup_card, alignment=Qt.AlignTop)
 
+        self.force_quit_card = ForceQuitCard()
+        self.layout.addWidget(self.force_quit_card, alignment=Qt.AlignTop)
+
         self.system_setting_label = SubtitleLabel(self)
         self.system_setting_label.setText("其他")
         self.layout.addWidget(self.system_setting_label)
@@ -52,9 +55,9 @@ class SundryWidget(QWidget):
         self.layout.addWidget(self.about_card, alignment=Qt.AlignTop)
 
 
-
 class AboutCard(CardWidget):
     """ App card """
+
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.iconWidget = IconWidget(FIF.GITHUB)
@@ -89,9 +92,9 @@ class AboutCard(CardWidget):
         self.hBoxLayout.addWidget(self.hyperlinkButton)
 
 
-
 class InstallNicCard(CardWidget):
     """ App card """
+
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.iconWidget = IconWidget(FIF.DEVELOPER_TOOLS)
@@ -123,7 +126,6 @@ class InstallNicCard(CardWidget):
         self.installButton.clicked.connect(self.install_nic_event)
         self.hBoxLayout.addWidget(self.installButton, 0, Qt.AlignRight)
 
-
     def install_nic_event(self):
         Logger().debug("Install Nic Event")
         try:
@@ -138,6 +140,7 @@ class InstallNicCard(CardWidget):
 
 class InstallBroadcastCard(CardWidget):
     """ App card """
+
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.iconWidget = IconWidget(FIF.DEVELOPER_TOOLS)
@@ -181,8 +184,66 @@ class InstallBroadcastCard(CardWidget):
             Info.createErrorInfoBar("未知错误，详情请见日志", parent=self.parent()).show()
 
 
+class ForceQuitCard(CardWidget):
+    """ App card """
+
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
+        self.iconWidget = IconWidget(FIF.QUIET_HOURS)
+        self.titleLabel = BodyLabel("强制关闭", self)
+        self.contentLabel = CaptionLabel("推荐开启", self)
+
+        self.hBoxLayout = QHBoxLayout(self)
+        self.vBoxLayout = QVBoxLayout()
+
+        self.setFixedHeight(73)
+        self.iconWidget.setFixedSize(16, 16)
+
+        self.hBoxLayout.setContentsMargins(20, 11, 11, 11)
+        self.hBoxLayout.setSpacing(15)
+        self.hBoxLayout.addWidget(self.iconWidget)
+
+        self.vBoxLayout.setContentsMargins(0, 0, 0, 0)
+        self.vBoxLayout.setSpacing(0)
+        self.vBoxLayout.addWidget(self.titleLabel, 0, Qt.AlignVCenter)
+        self.vBoxLayout.addWidget(self.contentLabel, 0, Qt.AlignVCenter)
+        self.vBoxLayout.setAlignment(Qt.AlignVCenter)
+        self.hBoxLayout.addLayout(self.vBoxLayout)
+
+        self.hBoxLayout.addStretch(1)
+
+        self.switchButton = SwitchButton(self)
+        self.switchButton.setOnText('开')
+        self.switchButton.setOffText('关')
+        self.switchButton.setChecked(Config().is_force_quit)
+
+        self.switchButton.move(48, 24)
+        self.switchButton.checkedChanged.connect(self.switch_force_quit_event)
+
+        self.hBoxLayout.addWidget(self.switchButton, 0, Qt.AlignRight)
+
+    def switch_force_quit_event(self):
+        Logger().debug("Switch Force Quit Event")
+        try:
+            if self.switchButton.isChecked():
+                Logger().info("Open force quit")
+                Config().is_force_quit = True
+            else:
+                Logger().info("Close force quit")
+                Config().is_force_quit = False
+        except N2NGuiException as e:
+            Logger().error(traceback.format_exc())
+            Info.createErrorInfoBar(str(e.args[0]), parent=self.parent()).show()
+        except Exception as e:
+            Logger().error(traceback.format_exc())
+            Info.createErrorInfoBar("未知错误，详情请见日志", parent=self.parent()).show()
+        finally:
+            self.switchButton.setChecked(Config().is_force_quit)
+
+
 class StartUpCard(CardWidget):
     """ App card """
+
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.iconWidget = IconWidget(FIF.POWER_BUTTON)

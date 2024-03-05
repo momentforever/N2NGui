@@ -10,6 +10,7 @@ class AdvancedSettingWidget(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.config = Config()
+        self.n2n_edge_config = self.config.get_cur_n2n_edge_config()
 
         self.setObjectName("Advanced Setting")
 
@@ -57,18 +58,19 @@ class AdvancedSettingWidget(QWidget):
         self.load_settings()
 
     def load_settings(self):
-        self.package_size_entry.setText(str(self.config.edge_package_size))
-        self.edge_description_entry.setText(self.config.edge_description)
-        self.edge_etc_args_entry.setText("\n".join(self.config.edge_etc_args))
-        self.enable_packet_forwarding_check_box.setChecked(self.config.enable_package_forwarding)
-        self.enable_accept_multi_mac_check_box.setChecked(self.config.enable_accept_multi_mac)
+        self.package_size_entry.setText(str(self.n2n_edge_config.edge_package_size))
+        self.edge_description_entry.setText(self.n2n_edge_config.edge_description)
+        self.edge_etc_args_entry.setText("\n".join(self.n2n_edge_config.edge_etc_args))
+        self.enable_packet_forwarding_check_box.setChecked(self.n2n_edge_config.enable_package_forwarding)
+        self.enable_accept_multi_mac_check_box.setChecked(self.n2n_edge_config.enable_accept_multi_mac)
 
     def save_settings(self):
-        self.config.edge_package_size = int(self.package_size_entry.text())
-        self.config.edge_description = self.edge_description_entry.text()
-        self.config.edge_etc_args = self.edge_etc_args_entry.toPlainText().split("\n")
-        self.config.enable_package_forwarding = self.enable_packet_forwarding_check_box.isChecked()
-        self.config.enable_accept_multi_mac = self.enable_accept_multi_mac_check_box.isChecked()
+        self.n2n_edge_config.edge_package_size = int(self.package_size_entry.text())
+        self.n2n_edge_config.edge_description = self.edge_description_entry.text()
+        self.n2n_edge_config.edge_etc_args = self.edge_etc_args_entry.toPlainText().split("\n")
+        self.n2n_edge_config.enable_package_forwarding = self.enable_packet_forwarding_check_box.isChecked()
+        self.n2n_edge_config.enable_accept_multi_mac = self.enable_accept_multi_mac_check_box.isChecked()
+        self.config.save()
 
     def showEvent(self, a0):
         self.load_settings()

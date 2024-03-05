@@ -23,6 +23,9 @@ class LogMonitorThread(QThread):
                     continue
                 self.update_signal.emit(line.strip())
 
-    def stop_wait(self):
+    def stop(self):
         self.stop_flag = True
-        self.wait(3000)
+
+    def stop_wait(self):
+        self.stop()
+        self.wait()

@@ -34,6 +34,7 @@ class N2NEdgeWidget(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.config = Config()
+        self.n2n_edge_config = self.config.get_cur_n2n_edge_config()
 
         self.font = QFont()
         self.font.setFamily("微软雅黑")
@@ -46,7 +47,7 @@ class N2NEdgeWidget(QWidget):
         self.supernode_label.setText("Supernode地址和端口：")
         self.supernode_entry = LineEdit(self)
         self.supernode_entry.setPlaceholderText("必填")
-        self.supernode_entry.setText(self.config.supernode)
+        self.supernode_entry.setText(self.n2n_edge_config.supernode)
         self.layout.addWidget(self.supernode_label)
         self.layout.addWidget(self.supernode_entry)
 
@@ -54,7 +55,7 @@ class N2NEdgeWidget(QWidget):
         self.edge_community_label.setText("小组名称：")
         self.edge_community_entry = LineEdit(self)
         self.edge_community_entry.setPlaceholderText("必填")
-        self.edge_community_entry.setText(self.config.edge_community)
+        self.edge_community_entry.setText(self.n2n_edge_config.edge_community)
         self.layout.addWidget(self.edge_community_label)
         self.layout.addWidget(self.edge_community_entry)
 
@@ -62,14 +63,14 @@ class N2NEdgeWidget(QWidget):
         self.edge_community_password_label.setText("小组密码：")
         self.edge_community_password_entry = LineEdit(self)
         self.edge_community_password_entry.setEchoMode(QLineEdit.Password)
-        self.edge_community_password_entry.setText(self.config.edge_community_password)
+        self.edge_community_password_entry.setText(self.n2n_edge_config.edge_community_password)
         self.layout.addWidget(self.edge_community_password_label)
         self.layout.addWidget(self.edge_community_password_entry)
 
         self.edge_ip_label = BodyLabel(self)
         self.edge_ip_label.setText("Edge地址：")
         self.edge_ip_entry = LineEdit(self)
-        self.edge_ip_entry.setText(self.config.edge_ip)
+        self.edge_ip_entry.setText(self.n2n_edge_config.edge_ip)
         self.layout.addWidget(self.edge_ip_label)
         self.layout.addWidget(self.edge_ip_entry)
 
@@ -113,21 +114,23 @@ class N2NEdgeWidget(QWidget):
             self.run_button.setText("运行")
 
     def save_config(self):
-        self.config.supernode = self.supernode_entry.text()
-        self.config.edge_ip = self.edge_ip_entry.text()
-        self.config.edge_community = self.edge_community_entry.text()
-        self.config.edge_community_password = self.edge_community_password_entry.text()
+        self.n2n_edge_config.supernode = self.supernode_entry.text()
+        self.n2n_edge_config.edge_ip = self.edge_ip_entry.text()
+        self.n2n_edge_config.edge_community = self.edge_community_entry.text()
+        self.n2n_edge_config.edge_community_password = self.edge_community_password_entry.text()
+        self.config.save()
 
     def run_n2n_edge_event(self):
         Logger().debug("Run N2N Edge Event")
         if self.n2n_edge_thread.get_status() in Status.ENABLE_START:
             self.save_config()
             self.run_button.setEnabled(False)
-            # 运行程序
+            # 非阻塞运行程序
             self.n2n_edge_thread.start()
         elif self.n2n_edge_thread.get_status() in Status.ENABLE_STOP:
+            # 阻止用户多次操作
             self.run_button.setEnabled(False)
-            # 终止程序
+            # 非阻塞终止程序
             self.n2n_edge_thread.stop()
 
     def leaveEvent(self, a0):

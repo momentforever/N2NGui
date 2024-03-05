@@ -58,4 +58,4 @@ class Path:
 
 N2NGUI_COPYRIGHT = "Copyright@2023"
 N2NGUI_AUTHOR = "moment_forever"
-N2NGUI_VERSION = "1.2.0_alpha"
+N2NGUI_VERSION = "1.2.0_beta"
