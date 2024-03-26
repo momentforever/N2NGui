@@ -1,4 +1,3 @@
-<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a name="readme-top"></a>
 <!--
 *** Thanks for checking out the Best-README-Template. If you have a suggestion
@@ -30,7 +29,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/momentforever/N2NGui">
-    <img src="images/title.png" alt="Logo" width="160" height="160">
+    <img src="images/title.png" alt="Logo" width="200" height="200">
   </a>
 
 <h3 align="center">N2NGui</h3>
@@ -178,7 +177,7 @@
 <!-- LICENSE -->
 ## 许可证
 
-分发在`MIT`许可下。有关更多信息，请参见`LICENSE.txt`。
+分发在`MIT`许可下。有关更多信息，请参见`LICENSE`。
 
 <p align="right">(<a href="#readme-top">回到顶部</a>)</p>
 

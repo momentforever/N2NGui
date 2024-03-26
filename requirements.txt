@@ -1,4 +1,4 @@
-pyinstaller~=5.11.0
-PyQt5~=5.15.9
-PyYAML~=6.0.1
+pyinstaller~=6.5.0
+PyQt5
+PyYAML
 PyQt-Fluent-Widgets
