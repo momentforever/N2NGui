@@ -19,7 +19,8 @@ class N2NEdgeTool(metaclass=Singleton):
     def __init__(self):
         self.process_status: Status = Status.OFF
         self._process: subprocess.Popen = None
-        self._config: N2NEdgeConfig = Config().get_cur_n2n_edge_config()
+        self._config: Config = Config()
+        self._n2n_config: N2NEdgeConfig = Config().get_cur_n2n_edge_config()
 
 
     def is_valid_ipv4_address(self, ip):
@@ -53,48 +54,48 @@ class N2NEdgeTool(metaclass=Singleton):
         cmd = []
         cmd.append(Path.EDGE_PATH)
 
-        if self._has_illegal_host(self._config.supernode):
+        if self._has_illegal_host(self._n2n_config.supernode):
             raise N2NGuiException("Supernode参数异常")
         cmd.append("-l")
-        cmd.append(str(self._config.supernode))
+        cmd.append(str(self._n2n_config.supernode))
 
-        if self._has_illegal_chars(self._config.edge_community):
+        if self._has_illegal_chars(self._n2n_config.edge_community):
             raise N2NGuiException("小组名称参数异常")
         cmd.append("-c")
-        cmd.append(str(self._config.edge_community))
+        cmd.append(str(self._n2n_config.edge_community))
 
-        if self._config.edge_community_password:
-            if self._has_illegal_chars(self._config.edge_community_password):
+        if self._n2n_config.edge_community_password:
+            if self._has_illegal_chars(self._n2n_config.edge_community_password):
                 raise N2NGuiException("小组密码参数异常")
             cmd.append("-k")
-            cmd.append(str(self._config.edge_community_password))
+            cmd.append(str(self._n2n_config.edge_community_password))
 
-        if self._config.edge_ip:
-            if not self.is_valid_ipv4_address(self._config.edge_ip):
+        if self._n2n_config.edge_ip:
+            if not self.is_valid_ipv4_address(self._n2n_config.edge_ip):
                 raise N2NGuiException("Edge地址参数异常")
             cmd.append("-a")
-            cmd.append(str(self._config.edge_ip))
+            cmd.append(str(self._n2n_config.edge_ip))
 
-        if self._config.edge_package_size:
-            if not isinstance(self._config.edge_package_size, int):
+        if self._n2n_config.edge_package_size:
+            if not isinstance(self._n2n_config.edge_package_size, int):
                 raise N2NGuiException("包大小参数异常")
             cmd.append("-M")
-            cmd.append(str(self._config.edge_package_size))
+            cmd.append(str(self._n2n_config.edge_package_size))
 
-        if self._config.edge_description:
-            if self._has_illegal_chars(self._config.edge_description):
+        if self._n2n_config.edge_description:
+            if self._has_illegal_chars(self._n2n_config.edge_description):
                 raise N2NGuiException("设备描述参数异常")
             cmd.append("-I")
-            cmd.append(str(self._config.edge_description))
+            cmd.append(str(self._n2n_config.edge_description))
 
-        if self._config.enable_package_forwarding:
+        if self._n2n_config.enable_package_forwarding:
             cmd.append("-r")
 
-        if self._config.enable_accept_multi_mac:
+        if self._n2n_config.enable_accept_multi_mac:
             cmd.append("-E")
 
-        if self._config.edge_etc_args:
-            for edge_etc_arg in self._config.edge_etc_args:
+        if self._n2n_config.edge_etc_args:
+            for edge_etc_arg in self._n2n_config.edge_etc_args:
                 edge_etc_arg = edge_etc_arg.split("#")[0]
                 if len(edge_etc_arg) == 0:
                     continue
@@ -118,24 +119,32 @@ class N2NEdgeTool(metaclass=Singleton):
 
         # 构建 n2n Edge 程序的命令行参数
         edge_cmd = self._generate_cmd()
-        Logger().info("Starting n2n edge...")
-        self.process_status = Status.STARTING
-
-        self._process = subprocess.Popen(edge_cmd,
-                                         stdout=subprocess.PIPE,
-                                         stderr=subprocess.PIPE,
-                                         creationflags=subprocess.CREATE_NO_WINDOW)
-        self.process_status = Status.ON
-        Logger().info("Start n2n edge!")
-
         while True:
-            # 进程终止
-            output = self._process.stdout.readline()
-            if output == b'' and self._process.poll() is not None:
-                break
-            self._log(output.decode(encoding='gbk').strip())
+            Logger().info("Starting n2n edge...")
+            self.process_status = Status.STARTING
 
-            time.sleep(0.1)  # 等待
+            self._process = subprocess.Popen(edge_cmd,
+                                             stdout=subprocess.PIPE,
+                                             stderr=subprocess.PIPE,
+                                             creationflags=subprocess.CREATE_NO_WINDOW)
+            self.process_status = Status.ON
+            Logger().info("Start n2n edge!")
+
+            while True:
+                # 进程终止
+                output = self._process.stdout.readline()
+                if output == b'' and self._process.poll() is not None:
+                    break
+                self._log(output.decode(encoding='gbk').strip())
+
+                time.sleep(0.1)  # 等待
+            self.process_status = Status.STOPPING
+
+            if self._config.is_restart_n2n():
+                Logger().info("Restarting n2n edge...")
+            else:
+                Logger().warning("The number of restarting n2n edge exceeds the limit!")
+                break
 
         self.process_status = Status.OFF
         Logger().info("Stopped n2n edge process!")
