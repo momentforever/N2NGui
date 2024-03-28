@@ -1,6 +1,7 @@
 """
 配置文件
 """
+import json
 from datetime import datetime
 
 import yaml
@@ -12,7 +13,7 @@ from src.common.const import Path
 
 class N2NEdgeConfig:
     def __init__(self, **kwargs):
-        # self.name: str = kwargs.get('name', "")
+        self.name: str = kwargs.get('name', "")
         self.supernode: str = kwargs.get("supernode", "")
         self.edge_ip: str = kwargs.get("edge_ip", "")
         self.edge_community: str = kwargs.get("edge_community", "")
@@ -25,6 +26,19 @@ class N2NEdgeConfig:
         # self.encryption_method: int = kwargs.get("encryption_method", 0)
         # self.encryption_key: str = kwargs.get("encryption_key", "")
         self.edge_etc_args: List[str] = kwargs.get("edge_etc_args", [])
+
+    def serialize(self):
+        return json.dumps(self.to_dict())
+
+    @staticmethod
+    def deserialize(s: str):
+        try:
+            n2n_edge_config_dic = json.loads(s)
+            n2n_edge_config = N2NEdgeConfig(**n2n_edge_config_dic)
+            return n2n_edge_config
+        except Exception as e:
+            return
+
 
     def to_dict(self):
         return self.__dict__
@@ -43,6 +57,7 @@ class Config(metaclass=Singleton):
 
         self.load()
 
+        self._cur_n2n_edge_config = self.get_cur_n2n_edge_config()
 
     def save(self):
         yaml_cfg = dict()
@@ -79,8 +94,34 @@ class Config(metaclass=Singleton):
             self.n2n_edge_configs.append(N2NEdgeConfig(**n2n_edge_config_dic))
 
     def get_cur_n2n_edge_config(self) -> N2NEdgeConfig:
-        try:
-            return self.n2n_edge_configs[self.cur_n2n_edge_config_index]
-        except Exception as e:
+        self.update_cur_n2n_edge_config()
+        return self._cur_n2n_edge_config
+
+    def update_cur_n2n_edge_config(self, index: [int, None] = None):
+        if len(self.n2n_edge_configs) == 0:
             self.n2n_edge_configs.append(N2NEdgeConfig())
-            return self.n2n_edge_configs[self.cur_n2n_edge_config_index]
+            self.cur_n2n_edge_config_index = 0
+
+        if self.cur_n2n_edge_config_index < 0 or self.cur_n2n_edge_config_index >= len(self.n2n_edge_configs):
+            self.cur_n2n_edge_config_index = 0
+
+        if index:
+            self.cur_n2n_edge_config_index = index
+
+        self._cur_n2n_edge_config = self.n2n_edge_configs[self.cur_n2n_edge_config_index]
+
+    def add_n2n_edge_config(self, n2n_edge_config: [str, None] = None):
+        if n2n_edge_config:
+            self.n2n_edge_configs.append(N2NEdgeConfig.deserialize(n2n_edge_config))
+        else:
+            self.n2n_edge_configs.append(N2NEdgeConfig())
+        self.cur_n2n_edge_config_index = len(self.n2n_edge_configs) - 1
+        self.update_cur_n2n_edge_config()
+
+    def del_n2n_edge_config(self, index):
+        if index < 0 or index >= len(self.n2n_edge_configs):
+            raise IndexError("Index out of list")
+        del self.n2n_edge_configs[index]
+        if self.cur_n2n_edge_config_index >= index > 0:
+            self.cur_n2n_edge_config_index -= 1
+        self.update_cur_n2n_edge_config()
