@@ -37,24 +37,12 @@ class Config(metaclass=Singleton):
         self.is_force_quit = True
 
         self.auto_restart_num = 5
-        self._auto_restart_cnt = self.auto_restart_num
-        self._auto_restart_time = datetime.now()
 
         self.cur_n2n_edge_config_index: int = 0
         self.n2n_edge_configs: List[N2NEdgeConfig] = []
 
         self.load()
 
-    def is_restart_n2n(self) -> bool:
-        self._auto_restart_cnt -= 1
-        if self._auto_restart_cnt < 0:
-            if (datetime.now() - self._auto_restart_time).days > 1:
-                # reset
-                self._auto_restart_cnt = self.auto_restart_num
-                self._auto_restart_time = datetime.now()
-                return True
-            return False
-        return True
 
     def save(self):
         yaml_cfg = dict()

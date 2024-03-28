@@ -6,6 +6,7 @@ import socket
 import subprocess
 import time
 import traceback
+from datetime import datetime
 
 from src.common.singleton import Singleton
 from src.common.const import *
@@ -21,7 +22,19 @@ class N2NEdgeTool(metaclass=Singleton):
         self._process: subprocess.Popen = None
         self._config: Config = Config()
         self._n2n_config: N2NEdgeConfig = Config().get_cur_n2n_edge_config()
+        self._auto_restart_cnt = self._config.auto_restart_num
+        self._auto_restart_time = datetime.now()
 
+    def is_restart_n2n(self) -> bool:
+        self._auto_restart_cnt -= 1
+        if self._auto_restart_cnt < 0:
+            if (datetime.now() - self._auto_restart_time).days > 1:
+                # reset
+                self._auto_restart_cnt = self._config.auto_restart_num
+                self._auto_restart_time = datetime.now()
+                return True
+            return False
+        return True
 
     def is_valid_ipv4_address(self, ip):
         try:
@@ -138,13 +151,15 @@ class N2NEdgeTool(metaclass=Singleton):
                 self._log(output.decode(encoding='gbk').strip())
 
                 time.sleep(0.1)  # 等待
-            self.process_status = Status.STOPPING
 
-            if self._config.is_restart_n2n():
-                Logger().info("Restarting n2n edge...")
-            else:
-                Logger().warning("The number of restarting n2n edge exceeds the limit!")
+            if self.process_status == Status.STOPPING:  # 正常手动终止
                 break
+            else:
+                if self.is_restart_n2n():
+                    Logger().info("Restarting n2n edge...")
+                else:
+                    Logger().warning("The number of restarting n2n edge exceeds the limit!")
+                    break
 
         self.process_status = Status.OFF
         Logger().info("Stopped n2n edge process!")
